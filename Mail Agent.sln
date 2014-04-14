@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30110.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mail Agent", "Mail Agent\Mail Agent.csproj", "{3DBDB9F1-CAEA-4B4C-9A57-2858BC7842F2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mail Agent Service", "Mail Agent Service\Mail Agent Service.csproj", "{F168A1FC-F648-48B3-AEF8-D09BCAFFCDF4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{9D3778BE-EB03-4C6F-9CCB-9847D80AC9CA}"
+	ProjectSection(SolutionItems) = preProject
+		Performance1.psess = Performance1.psess
+		Performance2.psess = Performance2.psess
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3DBDB9F1-CAEA-4B4C-9A57-2858BC7842F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3DBDB9F1-CAEA-4B4C-9A57-2858BC7842F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3DBDB9F1-CAEA-4B4C-9A57-2858BC7842F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3DBDB9F1-CAEA-4B4C-9A57-2858BC7842F2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F168A1FC-F648-48B3-AEF8-D09BCAFFCDF4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F168A1FC-F648-48B3-AEF8-D09BCAFFCDF4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F168A1FC-F648-48B3-AEF8-D09BCAFFCDF4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F168A1FC-F648-48B3-AEF8-D09BCAFFCDF4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

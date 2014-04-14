@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Settings>
+  <General>
+    
+    <Log>
+      <Location>C:\Users\miu2n\Desktop\log.txt</Location>
+      <Level>DEBUG</Level>
+    </Log>
+    
+    <Mail>
+      <!-- The rate to check the account (in seconds) -->
+      <Polling>10</Polling>
+      <ExchangeVersion>2010</ExchangeVersion>
+      <UseWindowsCredentials>False</UseWindowsCredentials>
+      <Email>miu2n@cmich.edu</Email>
+      <Password>M!les262536</Password>
+      <!-- Use Auto if you are using Autodiscover -->
+      <Url>Auto</Url>
+    </Mail>
+    
+  </General>
+  <Profiles>
+    <Profile name="Profile 1">
+      <EmailSubject></EmailSubject>
+      <EmailBody>
+        <Query></Query>
+      </EmailBody>
+      <MailOverrides>
+        <!-- Allow for Overrides to the mail account settings per profile -->
+      </MailOverrides>
+    </Profile>
+  </Profiles>
+</Settings>
