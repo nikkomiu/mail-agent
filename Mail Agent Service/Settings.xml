@@ -8,10 +8,10 @@
           2. Use an absolute path in the Location
         Otherwise logs will be stored in the APP_ROOT\logs\ directory.
         -->
-      <LocalLocation>False</LocalLocation>
+      <LocalLocation>True</LocalLocation>
       
       <!-- Location to save the log files, will date prepend on the final . -->
-      <Location>C:\Users\miu2n\Desktop\mail_agent.log</Location>
+      <Location>mail_agent.log</Location>
       <!--
         Defines the level of logging to output to the logs.
           1. NONE

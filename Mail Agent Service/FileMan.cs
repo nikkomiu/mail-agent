@@ -36,6 +36,11 @@ namespace Mail_Agent_Service
         {
             try
             {
+                string directory = this.FilePath.Substring(0, this.FilePath.LastIndexOf('\\'));
+
+                if (!Directory.Exists(directory))
+                    Directory.CreateDirectory(directory);
+
                 StreamReader reader = new StreamReader(this.FilePath);
 
                 this.fileContents = reader.ReadToEnd();
