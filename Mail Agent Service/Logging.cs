@@ -6,22 +6,22 @@ using System.Threading.Tasks;
 
 namespace Mail_Agent_Service
 {
-    class Logging
+    public class Logging
     {
         // Log Levels
         public enum Level { DEBUG, INFO, WARNING, ERROR, CRITICAL }
 
         private FileMan fManager;
-        private string logLevel;
+        private Level logLevel;
 
-        public Logging() : this("debug.log", "DEBUG")
+        public Logging() : this("debug.log", Level.DEBUG)
         {
         }
 
-        public Logging(string logName, string logLevel, bool isLocalFile = true)
+        public Logging(string logName, Level logLevel, bool isLocalFile = true)
         {
             // Set the log level to output
-            this.logLevel = logLevel.ToUpper();
+            this.logLevel = logLevel;
 
             // If it is a local file use a local path otherwise use an absolute path
             if (isLocalFile)

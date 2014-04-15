@@ -1,4 +1,5 @@
-﻿using Microsoft.Exchange.WebServices.Data;
+﻿using Microsoft.Exchange.WebServices;
+using Microsoft.Exchange.WebServices.Data;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -39,13 +40,29 @@ namespace Mail_Agent_Service
             }
         }
 
-        public void GetMail()
+        public void GetMail(List<Profile> Profiles, Logging log)
         {
             FindItemsResults<Item> inboxItems = exService.FindItems(WellKnownFolderName.Inbox, new ItemView(100));
 
             foreach (Item mailItem in inboxItems)
             {
+                if (mailItem.HasAttachments)
+                {
+                    log.WriteLine(Logging.Level.INFO, mailItem.Subject);
 
+                    // Load the item to get the body + attachments
+                    mailItem.Load();
+
+                    // Log the first line of the message
+                    log.WriteLine(Logging.Level.INFO, " -[body]: " + mailItem.Body.Text.ToString().Split('\n')[0]);
+
+                    AttachmentCollection mailAttachments = mailItem.Attachments;
+                    
+                    foreach (Attachment attachment in mailAttachments)
+                    {
+                        log.WriteLine(Logging.Level.INFO, " --[attachment]: " + attachment.Name);
+                    }
+                }
             }
         }
     }

@@ -34,11 +34,19 @@ namespace Mail_Agent_Service
 
         public void Read()
         {
-            StreamReader reader = new StreamReader(this.FilePath);
+            try
+            {
+                StreamReader reader = new StreamReader(this.FilePath);
 
-            this.fileContents = reader.ReadToEnd();
+                this.fileContents = reader.ReadToEnd();
 
-            reader.Close();
+                reader.Close();
+            }
+            catch (FileNotFoundException ex)
+            {
+                var newFile = File.Create(this.FilePath);
+                newFile.Close();
+            }
         }
 
         public void Save()
@@ -47,9 +55,10 @@ namespace Mail_Agent_Service
             if (this.FilePath.Length == 0)
                 throw new FileNotFoundException();
 
-            // Create the file if it doesnt exist
             if (!File.Exists(this.FilePath))
+            {
                 File.Create(this.FilePath);
+            }
 
             StreamWriter writer = new StreamWriter(this.FilePath);
 

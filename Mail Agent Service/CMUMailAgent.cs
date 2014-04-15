@@ -22,16 +22,6 @@ namespace Mail_Agent_Service
             // Create a new thread for the thread loop
             mainThread = new Thread(ThreadLoop);
 
-            // Parse the settings file
-            this.settings = new Settings();
-            settings.Parse();
-
-            // Setup the logging file
-            Debug = new Logging();
-
-            // Log the start of the thread with some settings information
-            Debug.Begin(settings.General);
-
             // Start the thread loop
             mainThread.Start();
         }
@@ -53,23 +43,36 @@ namespace Mail_Agent_Service
             // Make the thread sleep long enough to attach a debugger to the process
             Thread.Sleep(10000);
 #endif
+            // Parse the settings file
+            this.settings = new Settings();
+            settings.Parse();
+
+            // Setup the logging file
+            Debug = new Logging(settings.General["LogLocation"], Logging.Level.DEBUG, false);
+
+            // Log the start of the thread with some settings information
+            Debug.Begin(settings.General);
 
             // Convert MailPolling variable into an int
             int threadSleep;
             int.TryParse(settings.General["MailPolling"], out threadSleep);
 
-            ExchangeServer exchange = new ExchangeServer(settings.General);
-            
             // Loop "forever"
             while (true)
             {
                 try
                 {
-                    List<Microsoft.Exchange.WebServices.Data.Item> mailItems = exchange.GetMail();
+                    ExchangeServer exchange = new ExchangeServer(settings.General);
 
-                    foreach (Microsoft.Exchange.WebServices.Data.Item item in mailItems)
+                    exchange.GetMail(settings.Profiles, Debug);
+
+                    Debug.WriteLine(Logging.Level.INFO, settings.Profiles.Count.ToString());
+                    foreach (Profile p in settings.Profiles)
                     {
-                        Debug.WriteLine(Logging.Level.INFO, item.Subject);
+                        Debug.WriteLine(Logging.Level.INFO, p.Id);
+                        Debug.WriteLine(Logging.Level.INFO, p.Name);
+                        Debug.WriteLine(Logging.Level.INFO, p.EmailSubject);
+                        Debug.WriteLine(Logging.Level.INFO, p.EmailBody);
                     }
 
                     Debug.WriteLine(Logging.Level.INFO, "Thread is running...");

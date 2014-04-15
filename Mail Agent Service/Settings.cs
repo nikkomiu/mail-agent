@@ -8,21 +8,20 @@ namespace Mail_Agent_Service
 {
     class Settings
     {
-        private FileMan fManager;
-
         public Dictionary<string, string> General { get; set; }
-        public Dictionary<string, Profile> Profiles { get; set; }
+        public List<Profile> Profiles { get; set; }
 
         public Settings()
         {
             General = new Dictionary<string, string>();
-
-            fManager = FileMan.LocalFile("Settings.xml");
-            fManager.Read();
+            Profiles = new List<Profile>();
         }
 
         public void Parse()
         {
+            FileMan fManager = FileMan.LocalFile("Settings.xml");
+            fManager.Read();
+
             XmlReader xReader = XmlReader.Create(new StringReader(fManager.FileContents));
 
             string groupElement = string.Empty;
@@ -40,9 +39,9 @@ namespace Mail_Agent_Service
                             groupElement = xReader.Name;
                         }
 
-                        if (xReader.Name == "Profile" && groupElement == "Profiles")
+                        if (xReader.Name == "Profiles")
                         {
-                            Profile.CreateFromXml(xReader.ReadSubtree());
+                            Profiles.Add(Profile.CreateFromXml(xReader.ReadSubtree(), this.General["DefaultSavePath"]));
                         }
 
                         // Set parent to current element if it is a general subgroup
@@ -58,6 +57,8 @@ namespace Mail_Agent_Service
                         // Ex. Parent = Log, Element = Level, Dictionary Key = LogLevel
                         if (xReader.HasValue)
                         {
+                            if (currentElement == "DefaultSavePath")
+                                this.General[currentElement] = xReader.Value;
                             this.General[parentElement + currentElement] = xReader.Value;
                         }
                         break;
@@ -69,6 +70,8 @@ namespace Mail_Agent_Service
             }
 
             General["MailPolling"] += "000";
+
+            fManager = null;
         }
     }
 }
