@@ -26,7 +26,15 @@
     <Mail>
       <!-- The rate to check the account (in seconds) -->
       <Polling>10</Polling>
-      <!-- The version of Exchange that EWS is using. Default: 2010 -->
+      <!--
+        The version of Exchange that EWS is using. Default: 2010
+          - 2007 SP1
+          - 2010
+          - 2010 SP1
+          - 2010 SP2
+          - 2013
+          - 2013 SP1
+        -->
       <ExchangeVersion>2010</ExchangeVersion>
       <UseWindowsCredentials>False</UseWindowsCredentials>
       <Email>inma@cmich.edu</Email>
