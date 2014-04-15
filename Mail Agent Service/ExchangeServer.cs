@@ -16,17 +16,21 @@ namespace Mail_Agent_Service
 
         public ExchangeServer(Dictionary<string, string> settings)
         {
-            // TODO: Setup Exchange Version for Settings file
+            // Set the version of Exchange from settings file
+            this.exService = new ExchangeService(GetVersionFromString(settings["MailExchangeVersion"]));
 
-            this.exService = new ExchangeService(ExchangeVersion.Exchange2010);
-
+            // If not using windows credentials (from settings file) use manually define credentials
             if (settings["MailUseWindowsCredentials"].ToUpper() == "TRUE")
             {
+                // Use Windows Credentials
                 exService.UseDefaultCredentials = true;
             }
             else
             {
+                // Do not use Windows Credentials
                 exService.UseDefaultCredentials = false;
+
+                // Set the login credentials
                 exService.Credentials = new NetworkCredential(settings["MailEmail"], settings["MailPassword"]);
             }
 
@@ -43,6 +47,7 @@ namespace Mail_Agent_Service
                 exService.Url = new Uri(settings["MailUrl"]);
             }
 
+            // Set the error folder name from the settings
             ErrorFolderName = settings["MailErrorFolder"];
         }
 
@@ -56,68 +61,138 @@ namespace Mail_Agent_Service
                 {
                     try
                     {
-                        if (mailItem.HasAttachments)
+                        // TODO: Make sure the email should be used by this profile
+
+                        // Log the subject of the email being processed
+                        log.WriteLine(Logging.Level.DEBUG, mailItem.Subject);
+
+                        // Load the item to get the body + attachments
+                        mailItem.Load();
+
+                        // Save the body if the profile wants it saved
+                        if (profile.SaveEmailBody)
                         {
-                            log.WriteLine(Logging.Level.INFO, mailItem.Subject);
+                            // Get a number only timestamp
+                            long time = DateTime.Now.ToFileTime();
+                            
+                            // Save the file to the settings location with a filename of emailbody_{{timestamp}}.html
+                            File.WriteAllText(profile.SavePath + "emailbody_" + time + ".html", mailItem.Body);
+                            log.WriteLine(Logging.Level.INFO, "Email body was written to " + profile.SavePath + " with the filename body_" + time + ".html");
+                        }
 
-                            // Load the item to get the body + attachments
-                            mailItem.Load();
-
-                            // Log the first line of the message
-                            log.WriteLine(Logging.Level.INFO, " [body]: " + mailItem.Body.Text.ToString().Split('\n')[0]);
-
+                        // Save the attachments if the profile wants them saved
+                        if (mailItem.HasAttachments && profile.SaveAttachments)
+                        {
+                            // Get the attachments collection
                             AttachmentCollection mailAttachments = mailItem.Attachments;
 
-                            if (profile.SaveEmailBody)
+                            foreach (FileAttachment attachment in mailAttachments)
                             {
-                                long time = DateTime.Now.ToFileTime();
-                                File.WriteAllText(profile.SavePath + "body_" + time + ".html", mailItem.Body);
+                                // Load the attachment
+                                attachment.Load();
 
-                                log.WriteLine(Logging.Level.INFO, "Email body was written to " + profile.SavePath + " with the filename body_" + time + ".html");
-                            }
-
-                            if (profile.SaveAttachments)
-                            {
-                                foreach (FileAttachment attachment in mailAttachments)
-                                {
-                                    attachment.Load();
-
-                                    // Save the attachment
-                                    File.WriteAllBytes(profile.SavePath + attachment.Name, attachment.Content);
-
-                                    log.WriteLine(Logging.Level.INFO, "Attachment " + attachment.Name + " was written to " + profile.SavePath);
-                                }
+                                // Save the attachment to the location defined in the settings
+                                File.WriteAllBytes(profile.SavePath + attachment.Name, attachment.Content);
+                                log.WriteLine(Logging.Level.INFO, "Attachment " + attachment.Name + " was written to " + profile.SavePath);
                             }
                         }
 
+                        // Move the email to the deleted items folder
                         mailItem.Move(WellKnownFolderName.DeletedItems);
                         log.WriteLine(Logging.Level.INFO, "Moved " + mailItem.Subject + " to Deleted Items folder");
+
+                        // Remove the item from the list
+                        inboxItems.Items.Remove(mailItem);
                     }
                     catch (Exception ex)
                     {
                         // Log the error
                         log.WriteError(ex);
 
-                        if (ErrorFolderId == null)
-                        {
-                            FolderView folders = new FolderView(100);
-                            folders.PropertySet = new PropertySet(BasePropertySet.IdOnly);
-                            folders.PropertySet.Add(FolderSchema.DisplayName);
-                            folders.Traversal = FolderTraversal.Deep;
+                        // Move the email to the error folder
+                        MoveItemToErrorFolder(mailItem);
 
-                            FindFoldersResults folderResults = exService.FindFolders(WellKnownFolderName.Root, folders);
-
-                            foreach (Folder f in folderResults)
-                            {
-                                if (f.DisplayName == ErrorFolderName)
-                                    ErrorFolderId = f.Id;
-                            }
-                        }
-
-                        mailItem.Move(ErrorFolderId);
+                        // Remove the item from the list
+                        inboxItems.Items.Remove(mailItem);
                     }
                 }
             }
+
+            // Move the items still in the inbox to the error folder
+            foreach (Item unusedItem in inboxItems)
+            {
+                // Move the email to the error folder
+                MoveItemToErrorFolder(unusedItem);
+            }
+        }
+
+        private void MoveItemToErrorFolder(Item mailItem)
+        {
+            // Get the Error Folder ID if it is currently null
+            if (ErrorFolderId == null)
+                ErrorFolderId = GetFolderByName(ErrorFolderName);
+
+            // Move the item to the Error Folder
+            mailItem.Move(ErrorFolderId);
+        }
+
+        private FolderId GetFolderByName(string folderName)
+        {
+            // Get the top 100 folders for the email account
+            FolderView folders = new FolderView(100);
+
+            // Set the properties of the search
+            folders.PropertySet = new PropertySet(BasePropertySet.IdOnly);
+            folders.PropertySet.Add(FolderSchema.DisplayName);
+
+            // Set the traversal type for the folders
+            folders.Traversal = FolderTraversal.Deep;
+
+            // Get the folders collection
+            FindFoldersResults folderResults = exService.FindFolders(WellKnownFolderName.Root, folders);
+
+            // Loop through the folders until the correct one is found
+            foreach (Folder f in folderResults)
+            {
+                if (f.DisplayName == folderName)
+                    return f.Id;
+            }
+
+            // Return null if the folder is not real
+            return null;
+        }
+
+        private static ExchangeVersion GetVersionFromString(string checkVersion)
+        {
+            // Set exchange version (from settings)
+            ExchangeVersion version;
+
+            switch (checkVersion.Replace(" ", "").ToUpper())
+            {
+                case "2007SP1":
+                    version = ExchangeVersion.Exchange2007_SP1;
+                    break;
+                case "2010":
+                    version = ExchangeVersion.Exchange2010;
+                    break;
+                case "2010SP1":
+                    version = ExchangeVersion.Exchange2010_SP1;
+                    break;
+                case "2010SP2":
+                    version = ExchangeVersion.Exchange2010_SP2;
+                    break;
+                case "2013":
+                    version = ExchangeVersion.Exchange2013;
+                    break;
+                case "2013SP1":
+                    version = ExchangeVersion.Exchange2013_SP1;
+                    break;
+                default:
+                    version = ExchangeVersion.Exchange2010;
+                    break;
+            }
+
+            return version;
         }
     }
 }
