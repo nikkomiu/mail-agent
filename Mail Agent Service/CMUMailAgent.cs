@@ -9,7 +9,7 @@ namespace Mail_Agent_Service
     public partial class CMUMailAgent : ServiceBase
     {
         private Thread mainThread;
-        private Logging Debug;
+        private Logging Log;
         private Settings settings;
 
         public CMUMailAgent()
@@ -31,7 +31,7 @@ namespace Mail_Agent_Service
             base.OnStop();
 
             // Write the end statement to the log
-            Debug.End();
+            Log.End();
 
             // Destroy the thread
             mainThread.Abort();
@@ -53,10 +53,10 @@ namespace Mail_Agent_Service
             Enum.TryParse(settings.General["LogLevel"], true, out logLevel);
 
             // Setup the logging file
-            Debug = new Logging(settings.General["LogLocation"], logLevel, localLocation);
+            Log = new Logging(settings.General["LogLocation"], logLevel, localLocation);
 
             // Log the start of the thread with some settings information
-            Debug.Begin(settings.General);
+            Log.Begin(settings.General);
 
             // Convert MailPolling variable into an int
             int threadSleep;
@@ -69,21 +69,21 @@ namespace Mail_Agent_Service
                 {
                     ExchangeServer exchange = new ExchangeServer(settings.General);
 
-                    exchange.SaveMail(settings.Profiles, Debug);
+                    exchange.SaveMail(settings.Profiles, Log);
 
 #region TestingCode
-                    Debug.WriteLine(Logging.Level.DEBUG, "Number of Profiles: " + settings.Profiles.Count.ToString());
+                    Log.WriteLine(Logging.Level.DEBUG, "Number of Profiles: " + settings.Profiles.Count.ToString());
                     foreach (Profile p in settings.Profiles)
                     {
-                        Debug.WriteLine(Logging.Level.DEBUG, "::::::::::::::::::::::::::::::::::::::::::::::");
-                        Debug.WriteLine(Logging.Level.DEBUG, p.Id);
-                        Debug.WriteLine(Logging.Level.DEBUG, p.Name);
-                        Debug.WriteLine(Logging.Level.DEBUG, p.EmailSubject);
-                        Debug.WriteLine(Logging.Level.DEBUG, p.EmailBody);
-                        Debug.WriteLine(Logging.Level.DEBUG, "::::::::::::::::::::::::::::::::::::::::::::::");
+                        Log.WriteLine(Logging.Level.DEBUG, "::::::::::::::::::::::::::::::::::::");
+                        Log.WriteLine(Logging.Level.DEBUG, p.Id);
+                        Log.WriteLine(Logging.Level.DEBUG, p.Name);
+                        Log.WriteLine(Logging.Level.DEBUG, p.EmailSubject);
+                        Log.WriteLine(Logging.Level.DEBUG, p.EmailBody);
+                        Log.WriteLine(Logging.Level.DEBUG, "::::::::::::::::::::::::::::::::::::");
                     }
 
-                    Debug.WriteLine(Logging.Level.DEBUG, "Thread is running...");
+                    Log.WriteLine(Logging.Level.DEBUG, "Thread is running...");
 #endregion
 
                     Thread.Sleep(threadSleep);
@@ -91,19 +91,19 @@ namespace Mail_Agent_Service
                 // Exception for thread abort (OnStop)
                 catch (ThreadAbortException ex)
                 {
-                    Debug.WriteLine(Logging.Level.WARNING, "Thread exiting!");
+                    Log.WriteLine(Logging.Level.WARNING, "Thread exiting!");
                 }
                 catch (Exception ex)
                 {
                     // Write the exception to the log
-                    Debug.WriteError(ex);
+                    Log.WriteError(ex);
                 }
 
                 // Garbage collection
-                Debug.WriteLine(Logging.Level.DEBUG, "Memory Free: " + GC.GetTotalMemory(false));
-                Debug.WriteLine(Logging.Level.DEBUG, "Collecting Garbage...");
+                Log.WriteLine(Logging.Level.DEBUG, "Memory Free: " + GC.GetTotalMemory(false));
+                Log.WriteLine(Logging.Level.DEBUG, "Collecting Garbage...");
                 GC.Collect();
-                Debug.WriteLine(Logging.Level.DEBUG, "Memory Free: " + GC.GetTotalMemory(true));
+                Log.WriteLine(Logging.Level.DEBUG, "Memory Free: " + GC.GetTotalMemory(true));
             }
         }
     }
