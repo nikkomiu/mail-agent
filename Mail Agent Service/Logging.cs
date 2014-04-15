@@ -91,14 +91,24 @@ namespace Mail_Agent_Service
 
         private static string LineText(Level logLevel)
         {
-            return "(" + CurrentTimestamp() + ") " + "[" + logLevel.ToString() + "]: ";
+            return "(" + CurrentTimestamp() + ") " + "[" + PaddedLogLevel(logLevel) + "]: ";
+        }
+
+        private static string PaddedLogLevel(Level logLevel)
+        {
+            string levelString = logLevel.ToString();
+            int halfLength = (4 - (int)(levelString.Length/2)) + levelString.Length;
+            levelString = levelString.PadRight(halfLength, ' ');
+            levelString = levelString.PadLeft(8, ' ');
+
+            return levelString;
         }
 
         private static string CurrentDate(DateTime time)
         {
-            return time.Year  + "-" +
-                   time.Month + "-" +
-                   time.Day;
+            return time.Year.ToString("D4")  + "-" +
+                   time.Month.ToString("D2") + "-" +
+                   time.Day.ToString("D2");
         }
 
         private static string CurrentTimestamp()
@@ -106,10 +116,10 @@ namespace Mail_Agent_Service
             DateTime time = DateTime.Now;
 
             return CurrentDate(time) + " " +
-                time.Hour + ":" +
-                time.Minute + ":" +
-                time.Second + ":" +
-                time.Millisecond;
+                time.Hour.ToString("D2") + ":" +
+                time.Minute.ToString("D2") + ":" +
+                time.Second.ToString("D2") + ":" +
+                time.Millisecond.ToString("D3");
         }
     }
 }
