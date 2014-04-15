@@ -2,20 +2,43 @@
 <Settings>
   <General>
     <Log>
-      <Location>C:\Users\miu2n\Desktop\log.txt</Location>
+      <!-- 
+        If the logs are going to be stored outside of the applicaiton directory:
+          1. Set LocalLocation to True
+          2. Use an absolute path in the Location
+        Otherwise logs will be stored in the APP_ROOT\logs\ directory.
+        -->
+      <LocalLocation>False</LocalLocation>
+      
+      <!-- Location to save the log files, will date prepend on the final . -->
+      <Location>C:\Users\miu2n\Desktop\mail_agent.log</Location>
+      <!--
+        Defines the level of logging to output to the logs.
+          1. NONE
+          2. CRITICAL
+          3. ERROR
+          4. WARNING
+          5. INFO
+          6. DEBUG
+        -->
       <Level>DEBUG</Level>
     </Log>
     <Mail>
       <!-- The rate to check the account (in seconds) -->
       <Polling>10</Polling>
+      <!-- The version of Exchange that EWS is using. Default: 2010 -->
       <ExchangeVersion>2010</ExchangeVersion>
       <UseWindowsCredentials>False</UseWindowsCredentials>
       <Email>inma@cmich.edu</Email>
+      <!-- Not required if using Windows Credentials -->
       <Password>GC9zL6LuBDsTQCfXmrdV</Password>
+      <!-- The Outlook folder that mail items go when there is an error or no profile associated to the email -->
+      <ErrorFolder>Errors</ErrorFolder>
       <!-- Use Auto if you are using Autodiscover -->
       <Url>Auto</Url>
     </Mail>
-    <DefaultSavePath>C:\Users\miu2n\Desktop\</DefaultSavePath>
+    <!-- The default path to save email files. Requires a trailing \ -->
+    <DefaultSavePath>\\imageapp-test\c$\Users\miu2n\Desktop\</DefaultSavePath>
   </General>
   <Profiles>
     <Profile>
@@ -24,7 +47,7 @@
       <EmailBody>Document</EmailBody>
       <SaveAttachments>True</SaveAttachments>
       <SaveBody>False</SaveBody>
-      <SavePath>C:\Users\miu2n\Desktop\</SavePath>
+      <!--<SavePath>\\imageapp-res\miu2n-download\</SavePath>-->
     </Profile>
   </Profiles>
 </Settings>
