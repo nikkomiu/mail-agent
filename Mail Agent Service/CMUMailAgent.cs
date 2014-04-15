@@ -47,8 +47,13 @@ namespace Mail_Agent_Service
             this.settings = new Settings();
             settings.Parse();
 
+            bool localLocation;
+            bool.TryParse(settings.General["LogLocalLocation"], out localLocation);
+            Logging.Level logLevel;
+            Enum.TryParse(settings.General["LogLevel"], true, out logLevel);
+
             // Setup the logging file
-            Debug = new Logging(settings.General["LogLocation"], Logging.Level.DEBUG, false);
+            Debug = new Logging(settings.General["LogLocation"], logLevel, localLocation);
 
             // Log the start of the thread with some settings information
             Debug.Begin(settings.General);
@@ -64,31 +69,41 @@ namespace Mail_Agent_Service
                 {
                     ExchangeServer exchange = new ExchangeServer(settings.General);
 
-                    exchange.GetMail(settings.Profiles, Debug);
+                    exchange.SaveMail(settings.Profiles, Debug);
 
-                    Debug.WriteLine(Logging.Level.INFO, settings.Profiles.Count.ToString());
+#region TestingCode
+                    Debug.WriteLine(Logging.Level.DEBUG, "Number of Profiles: " + settings.Profiles.Count.ToString());
                     foreach (Profile p in settings.Profiles)
                     {
-                        Debug.WriteLine(Logging.Level.INFO, p.Id);
-                        Debug.WriteLine(Logging.Level.INFO, p.Name);
-                        Debug.WriteLine(Logging.Level.INFO, p.EmailSubject);
-                        Debug.WriteLine(Logging.Level.INFO, p.EmailBody);
+                        Debug.WriteLine(Logging.Level.DEBUG, "::::::::::::::::::::::::::::::::::::::::::::::");
+                        Debug.WriteLine(Logging.Level.DEBUG, p.Id);
+                        Debug.WriteLine(Logging.Level.DEBUG, p.Name);
+                        Debug.WriteLine(Logging.Level.DEBUG, p.EmailSubject);
+                        Debug.WriteLine(Logging.Level.DEBUG, p.EmailBody);
+                        Debug.WriteLine(Logging.Level.DEBUG, "::::::::::::::::::::::::::::::::::::::::::::::");
                     }
 
-                    Debug.WriteLine(Logging.Level.INFO, "Thread is running...");
+                    Debug.WriteLine(Logging.Level.DEBUG, "Thread is running...");
+#endregion
 
                     Thread.Sleep(threadSleep);
                 }
                 // Exception for thread abort (OnStop)
                 catch (ThreadAbortException ex)
                 {
-                    Debug.WriteLine(Logging.Level.INFO, "Thread exiting!");
+                    Debug.WriteLine(Logging.Level.WARNING, "Thread exiting!");
                 }
                 catch (Exception ex)
                 {
                     // Write the exception to the log
                     Debug.WriteError(ex);
                 }
+
+                // Garbage collection
+                Debug.WriteLine(Logging.Level.DEBUG, "Memory Free: " + GC.GetTotalMemory(false));
+                Debug.WriteLine(Logging.Level.DEBUG, "Collecting Garbage...");
+                GC.Collect();
+                Debug.WriteLine(Logging.Level.DEBUG, "Memory Free: " + GC.GetTotalMemory(true));
             }
         }
     }
