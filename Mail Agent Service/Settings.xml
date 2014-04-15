@@ -12,6 +12,7 @@
       
       <!-- Location to save the log files, will date prepend on the final . -->
       <Location>mail_agent.log</Location>
+      
       <!--
         Defines the level of logging to output to the logs.
           1. NONE
@@ -26,6 +27,7 @@
     <Mail>
       <!-- The rate to check the account (in seconds) -->
       <Polling>10</Polling>
+      
       <!--
         The version of Exchange that EWS is using. Default: 2010
           - 2007 SP1
@@ -37,11 +39,16 @@
         -->
       <ExchangeVersion>2010</ExchangeVersion>
       <UseWindowsCredentials>False</UseWindowsCredentials>
+      
+      <!-- Email address to check -->
       <Email>inma@cmich.edu</Email>
+      
       <!-- Not required if using Windows Credentials -->
       <Password>GC9zL6LuBDsTQCfXmrdV</Password>
+      
       <!-- The Outlook folder that mail items go when there is an error or no profile associated to the email -->
       <ErrorFolder>Errors</ErrorFolder>
+      
       <!-- Use Auto if you are using Autodiscover -->
       <Url>Auto</Url>
     </Mail>
@@ -56,6 +63,14 @@
       <SaveAttachments>True</SaveAttachments>
       <SaveBody>False</SaveBody>
       <!--<SavePath>\\imageapp-res\miu2n-download\</SavePath>-->
+    </Profile>
+    <Profile>
+      <Name>Profile 2</Name>
+      <EmailSubject>INMA:</EmailSubject>
+      <EmailBody>Document</EmailBody>
+      <SaveAttachments>True</SaveAttachments>
+      <SaveBody>False</SaveBody>
+      <SavePath>\\imageapp-res\miu2n-download\</SavePath>
     </Profile>
   </Profiles>
 </Settings>
