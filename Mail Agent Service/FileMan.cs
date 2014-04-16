@@ -20,10 +20,8 @@ namespace Mail_Agent_Service
         // Internal file contents
         private string fileContents;
 
-        public FileMan()
+        public FileMan() : this(string.Empty)
         {
-            this.FilePath = string.Empty;
-            this.fileContents = string.Empty;
         }
 
         public FileMan(string filePath)
@@ -47,7 +45,7 @@ namespace Mail_Agent_Service
 
                 reader.Close();
             }
-            catch (FileNotFoundException ex)
+            catch (FileNotFoundException)
             {
                 var newFile = File.Create(this.FilePath);
                 newFile.Close();

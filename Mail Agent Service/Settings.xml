@@ -58,16 +58,16 @@
   <Profiles>
     <Profile>
       <Name>Profile 1</Name>
-      <EmailSubject>INMA:</EmailSubject>
+      <EmailSubject></EmailSubject>
       <EmailBody>Document</EmailBody>
-      <SaveAttachments>True</SaveAttachments>
-      <SaveBody>False</SaveBody>
+      <SaveAttachments>False</SaveAttachments>
+      <SaveBody>True</SaveBody>
       <!--<SavePath>\\imageapp-res\miu2n-download\</SavePath>-->
     </Profile>
     <Profile>
       <Name>Profile 2</Name>
       <EmailSubject>INMA:</EmailSubject>
-      <EmailBody>Document</EmailBody>
+      <EmailBody></EmailBody>
       <SaveAttachments>True</SaveAttachments>
       <SaveBody>False</SaveBody>
       <SavePath>\\imageapp-res\miu2n-download\</SavePath>

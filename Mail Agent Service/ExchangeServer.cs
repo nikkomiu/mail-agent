@@ -69,6 +69,26 @@ namespace Mail_Agent_Service
                         // Load the item to get the body + attachments
                         mailItem.Load();
 
+                        // If the profile has an email subject to match then check the email subject for the string
+                        if (profile.EmailSubject.Length > 0)
+                        {
+                            // If the email subject does not contain the profile subject skip the current email
+                            if (!mailItem.Subject.Contains(profile.EmailSubject))
+                            {
+                                continue;
+                            }
+                        }
+
+                        // If the profile has an email body to match then check the email body for the string
+                        if (profile.EmailBody.Length > 0)
+                        {
+                            // If the email body does not contain the profile body skip the current email
+                            if (!mailItem.Body.Text.Contains(profile.EmailBody))
+                            {
+                                continue;
+                            }
+                        }
+
                         // Save the body if the profile wants it saved
                         if (profile.SaveEmailBody)
                         {

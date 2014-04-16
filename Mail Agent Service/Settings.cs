@@ -39,7 +39,7 @@ namespace Mail_Agent_Service
                             groupElement = xReader.Name;
                         }
 
-                        if (xReader.Name == "Profiles")
+                        if (xReader.Name == "Profile")
                         {
                             Profiles.Add(Profile.CreateFromXml(xReader.ReadSubtree(), this.General["DefaultSavePath"]));
                         }
