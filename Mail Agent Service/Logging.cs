@@ -38,12 +38,6 @@ namespace Mail_Agent_Service
                 fManager = new FileMan(logName);
         }
 
-        public void WriteLine(Level logLevel, string logText)
-        {
-            logText += "\r\n";
-            this.Write(logLevel, logText);
-        }
-
         public void Write(Level logLevel, string logText)
         {
             if (this.IsLogLevelHighEnough(logLevel))
@@ -52,6 +46,27 @@ namespace Mail_Agent_Service
                 fManager.Append(LineText(logLevel) + logText);
                 fManager.Save();
             }
+        }
+
+        public void WriteLine(Level logLevel, string logText)
+        {
+            logText += "\r\n";
+            this.Write(logLevel, logText);
+        }
+
+        public void WriteError(Exception ex)
+        {
+            this.WriteLine(Logging.Level.CRITICAL, "====================================================================");
+            this.WriteLine(Logging.Level.CRITICAL, "There was an error that the program could not handle on its own:");
+            this.WriteLine(Logging.Level.CRITICAL, ex.Message);
+            this.WriteLine(Logging.Level.CRITICAL, "with an error type:");
+            this.WriteLine(Logging.Level.CRITICAL, ex.GetType().ToString());
+            this.WriteLine(Logging.Level.CRITICAL, "====================================================================");
+        }
+
+        private bool IsLogLevelHighEnough(Level outputLevel)
+        {
+            return (logLevel >= outputLevel) ? true : false;
         }
 
         public void Begin(Dictionary<string, string> settings)
@@ -72,21 +87,6 @@ namespace Mail_Agent_Service
             this.WriteLine(Level.WARNING, "-----------------------------------------------------------");
             this.WriteLine(Level.WARNING, "Process has ended @ " + DateTime.Now.ToString());
             this.WriteLine(Level.WARNING, "-----------------------------------------------------------");
-        }
-
-        public void WriteError(Exception ex)
-        {
-            this.WriteLine(Logging.Level.CRITICAL, "====================================================================");
-            this.WriteLine(Logging.Level.CRITICAL, "There was an error that the program could not handle on its own:");
-            this.WriteLine(Logging.Level.CRITICAL, ex.Message);
-            this.WriteLine(Logging.Level.CRITICAL, "Was Caused By:");
-            this.WriteLine(Logging.Level.CRITICAL, ex.Source);
-            this.WriteLine(Logging.Level.CRITICAL, "====================================================================");
-        }
-
-        private bool IsLogLevelHighEnough(Level outputLevel)
-        {
-            return (logLevel >= outputLevel) ? true : false;
         }
 
         private static string LineText(Level logLevel)

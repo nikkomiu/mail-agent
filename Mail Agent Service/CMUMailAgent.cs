@@ -71,28 +71,14 @@ namespace Mail_Agent_Service
 
                     exchange.SaveMail(settings.Profiles, Log);
 
-#region TestingCode
-                    Log.WriteLine(Logging.Level.DEBUG, "Number of Profiles: " + settings.Profiles.Count.ToString());
-                    foreach (Profile p in settings.Profiles)
-                    {
-                        Log.WriteLine(Logging.Level.DEBUG, "::::::::::::::::::::::::::::::::::::");
-                        Log.WriteLine(Logging.Level.DEBUG, p.Id);
-                        Log.WriteLine(Logging.Level.DEBUG, p.Name);
-                        Log.WriteLine(Logging.Level.DEBUG, p.EmailSubject);
-                        Log.WriteLine(Logging.Level.DEBUG, p.EmailBody);
-                        Log.WriteLine(Logging.Level.DEBUG, "::::::::::::::::::::::::::::::::::::");
-                    }
-
-                    Log.WriteLine(Logging.Level.DEBUG, "Thread is running...");
-#endregion
-
                     Thread.Sleep(threadSleep);
                 }
-                // Exception for thread abort (OnStop)
+                // Catch exception for thread abort (OnStop)
                 catch (ThreadAbortException ex)
                 {
                     Log.WriteLine(Logging.Level.WARNING, "Thread exiting!");
                 }
+                // Catch other general exceptions
                 catch (Exception ex)
                 {
                     // Write the exception to the log

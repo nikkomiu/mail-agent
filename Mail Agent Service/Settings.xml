@@ -46,8 +46,11 @@
       <!-- Not required if using Windows Credentials -->
       <Password>GC9zL6LuBDsTQCfXmrdV</Password>
       
-      <!-- The Outlook folder that mail items go when there is an error or no profile associated to the email -->
+      <!-- The Exchange folder where mail items go when there is an error or no profile associated to the email -->
       <ErrorFolder>Errors</ErrorFolder>
+
+      <!-- The Exchange folder where mail items go when they have been fully processed -->
+      <SuccessFolder>Success</SuccessFolder>
       
       <!-- Use Auto if you are using Autodiscover -->
       <Url>Auto</Url>

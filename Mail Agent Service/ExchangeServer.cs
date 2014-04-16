@@ -14,6 +14,9 @@ namespace Mail_Agent_Service
         private FolderId ErrorFolderId;
         private string ErrorFolderName;
 
+        private FolderId SuccessFolderId;
+        private string SuccessFolderName;
+
         public ExchangeServer(Dictionary<string, string> settings)
         {
             // Set the version of Exchange from settings file
@@ -49,11 +52,14 @@ namespace Mail_Agent_Service
 
             // Set the error folder name from the settings
             ErrorFolderName = settings["MailErrorFolder"];
+            SuccessFolderName = settings["MailSuccessFolder"];
         }
 
         public void SaveMail(List<Profile> Profiles, Logging log)
         {
             FindItemsResults<Item> inboxItems = exService.FindItems(WellKnownFolderName.Inbox, new ItemView(100));
+
+            List<Item> completeInboxItems = new List<Item>();
 
             foreach (Profile profile in Profiles)
             {
@@ -118,11 +124,8 @@ namespace Mail_Agent_Service
                         }
 
                         // Move the email to the deleted items folder
-                        mailItem.Move(WellKnownFolderName.DeletedItems);
-                        log.WriteLine(Logging.Level.INFO, "Moved " + mailItem.Subject + " to Deleted Items folder");
-
-                        // Remove the item from the list
-                        inboxItems.Items.Remove(mailItem);
+                        MoveItemToFolder(mailItem, SuccessFolderName, SuccessFolderId);
+                        log.WriteLine(Logging.Level.INFO, "Moved " + mailItem.Subject + " to " + SuccessFolderName + " folder");
                     }
                     catch (Exception ex)
                     {
@@ -130,30 +133,35 @@ namespace Mail_Agent_Service
                         log.WriteError(ex);
 
                         // Move the email to the error folder
-                        MoveItemToErrorFolder(mailItem);
-
-                        // Remove the item from the list
-                        inboxItems.Items.Remove(mailItem);
+                        MoveItemToFolder(mailItem, ErrorFolderName, ErrorFolderId);
                     }
+
+                    completeInboxItems.Add(mailItem);
                 }
             }
 
             // Move the items still in the inbox to the error folder
-            foreach (Item unusedItem in inboxItems)
+            foreach (Item mailItem in inboxItems)
             {
+                // If the item has already been processed skip it
+                if (completeInboxItems.Contains(mailItem))
+                {
+                    continue;
+                }
+
                 // Move the email to the error folder
-                MoveItemToErrorFolder(unusedItem);
+                MoveItemToFolder(mailItem, ErrorFolderName, ErrorFolderId);
             }
         }
 
-        private void MoveItemToErrorFolder(Item mailItem)
+        private void MoveItemToFolder(Item mailItem, string folderName, FolderId folderId = null)
         {
-            // Get the Error Folder ID if it is currently null
-            if (ErrorFolderId == null)
-                ErrorFolderId = GetFolderByName(ErrorFolderName);
+            // If the folder id is null get the folder id by the folder name
+            if (folderId == null)
+                folderId = GetFolderByName(folderName);
 
-            // Move the item to the Error Folder
-            mailItem.Move(ErrorFolderId);
+            // Move the message to the folder
+            mailItem.Move(folderId);
         }
 
         private FolderId GetFolderByName(string folderName)
