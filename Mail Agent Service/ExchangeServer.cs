@@ -111,8 +111,19 @@ namespace Mail_Agent_Service
                             long time = DateTime.Now.ToFileTime();
                             
                             // Save the file to the settings location with a filename of emailbody_{{timestamp}}.html
-                            File.WriteAllText(profile.SavePath + "emailbody_" + time + ".html", mailItem.Body);
-                            log.WriteLine(Logging.Level.INFO, "Email body was written to " + profile.SavePath + " with the filename body_" + time + ".html");
+                            string emailFilename = "emailbody_" + time + ".html";
+                            
+                            File.WriteAllText(profile.SavePath + emailFilename, mailItem.Body);
+                            log.WriteLine(Logging.Level.INFO, "Email body was written to " + profile.SavePath + " with the filename " + emailFilename);
+
+                            localExportText += emailFilename + profile.Delimiter;
+
+                            foreach (Key k in profile.Keys)
+                            {
+                                localExportText += k.ToDynamicString(profile.Delimiter, mailItem.Body);
+                            }
+
+                            localExportText += "\r\n";
                         }
 
                         // Save the attachments if the profile wants them saved
@@ -129,15 +140,17 @@ namespace Mail_Agent_Service
                                 // Save the attachment to the location defined in the settings
                                 File.WriteAllBytes(profile.SavePath + attachment.Name, attachment.Content);
                                 log.WriteLine(Logging.Level.INFO, "Attachment " + attachment.Name + " was written to " + profile.SavePath);
+
+                                localExportText += attachment.Name + profile.Delimiter;
+
+                                foreach (Key k in profile.Keys)
+                                {
+                                    localExportText += k.ToDynamicString(profile.Delimiter, mailItem.Body);
+                                }
+
+                                localExportText += "\r\n";
                             }
                         }
-
-                        foreach (Key k in profile.Keys)
-                        {
-                            localExportText += k.ToDynamicString(profile.Delimiter, mailItem.Body);
-                        }
-
-                        localExportText += "\r\n";
 
                         // Move the email to the deleted items folder
                         MoveItemToFolder(mailItem, SuccessFolderName, SuccessFolderId);
@@ -155,20 +168,25 @@ namespace Mail_Agent_Service
                     completeInboxItems.Add(mailItem);
                 }
 
-                if (!profile.IsDefaultPath)
+                if (completeInboxItems.Count > 0 && localExportText.Length > 0)
                 {
-                    // Write the index file
-                    File.WriteAllText(profile.SavePath + ExportFilename, localExportText);
-                }
-                else
-                {
-                    // Add the items to the global list
-                    globalExportText += localExportText;
+                    if (!profile.IsDefaultPath)
+                    {
+                        File.WriteAllText(profile.SavePath + DateTime.Now.ToFileTime() + ExportFilename, localExportText);
+                    }
+                    else
+                    {
+                        // Add the items to the global list
+                        globalExportText += localExportText;
+                    }
                 }
             }
 
-            // Write the global index file
-            File.WriteAllText(GlobalSavePath + ExportFilename, globalExportText);
+            if (completeInboxItems.Count > 0 && globalExportText.Length > 0)
+            {
+                // Append to the existing index file
+                File.WriteAllText(GlobalSavePath + DateTime.Now.ToFileTime() + ExportFilename, globalExportText);
+            }
 
             // Move the items still in the inbox to the error folder
             foreach (Item mailItem in inboxItems)

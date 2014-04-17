@@ -94,14 +94,15 @@
             - DATETIME
             - DATE
             - TIME
+            - NULL
         -->
       <Keys>
         <Drawer Type="Static">OIT-TC-View</Drawer>
-        <Field1 Type="Search"></Field1>
-        <Field2 Type="Search"></Field2>
-        <Field3 Type="Search"></Field3>
-        <Field4 Type="Search"></Field4>
-        <Field5 Type="Search"></Field5>
+        <Field1 Type="Static">Abc</Field1>
+        <Field2 Type="Static">Def</Field2>
+        <Field3 Type="Static">Ghi</Field3>
+        <Field4 Type="Dynamic">NULL</Field4>
+        <Field5 Type="Dynamic">DATETIME</Field5>
         <DocType Type="Static">OIT-TC-A Document Type</DocType>
       </Keys>
     </Profile>
@@ -112,13 +113,13 @@
       <SaveAttachments>True</SaveAttachments>
       <SavePath>\\imageapp-res\miu2n-download\</SavePath>
       <Keys>
-        <Drawer Manual="True">OIT-TC-View</Drawer>
-        <Field1 Manual="False"></Field1>
-        <Field2></Field2>
-        <Field3></Field3>
-        <Field4></Field4>
-        <Field5></Field5>
-        <DocType></DocType>
+        <Drawer Type="Static">OIT-TC-View</Drawer>
+        <Field1 Type="Static">aaa</Field1>
+        <Field2 Type="Static">bbb</Field2>
+        <Field3 Type="Dynamic">NULL</Field3>
+        <Field4 Type="Dynamic">NULL</Field4>
+        <Field5 Type="Dynamic">DATE</Field5>
+        <DocType Type="Static">SomethingCool</DocType>
       </Keys>
     </Profile>
   </Profiles>

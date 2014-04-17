@@ -23,18 +23,21 @@ namespace Mail_Agent_Service
         {
             string returnString = string.Empty;
 
+            if (this.Type == null)
+                throw new NotSupportedException();
+
             if (this.Type == "Static")
             {
                 returnString = this.Value;
             }
             else if (this.Type == "Dynamic")
             {
-                if (this.Type == "DATE" || this.Type == "DATETIME")
+                if (this.Value == "DATE" || this.Value == "DATETIME")
                 {
                     returnString += DateTime.Now.ToShortDateString();
                 }
 
-                if (this.Type == "TIME" || this.Type == "DATETIME")
+                if (this.Value == "TIME" || this.Value == "DATETIME")
                 {
                     returnString += DateTime.Now.ToShortTimeString();
                 }
