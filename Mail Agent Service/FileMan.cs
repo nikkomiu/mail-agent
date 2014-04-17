@@ -39,11 +39,7 @@ namespace Mail_Agent_Service
                 if (!Directory.Exists(directory))
                     Directory.CreateDirectory(directory);
 
-                StreamReader reader = new StreamReader(this.FilePath);
-
-                this.fileContents = reader.ReadToEnd();
-
-                reader.Close();
+                this.fileContents = File.ReadAllText(this.FilePath);
             }
             catch (FileNotFoundException)
             {
@@ -75,16 +71,7 @@ namespace Mail_Agent_Service
 
         public void Append(string appendString)
         {
-            if (this.fileContents.Length == 0)
-                this.Read();
-            this.fileContents += appendString;
-        }
-
-        public void Prepend(string prependString)
-        {
-            if (this.fileContents.Length == 0)
-                this.Read();
-            this.fileContents = prependString + this.fileContents;
+            File.AppendAllText(this.FilePath, appendString);
         }
 
         public static FileMan LocalFile(string filePath)

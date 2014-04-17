@@ -19,6 +19,11 @@ namespace Mail_Agent_Service
         public bool SaveAttachments { get; set; }
         public bool SaveEmailBody { get; set; }
         public string SavePath { get; set; }
+        public bool IsDefaultPath { get; set; }
+
+        public string Delimiter { get; set; }
+
+        public List<Key> Keys { get; set; }
 
         public Profile()
         {
@@ -30,51 +35,74 @@ namespace Mail_Agent_Service
             this.SaveAttachments = false;
             this.SaveEmailBody = false;
             this.SavePath = string.Empty;
+            this.IsDefaultPath = false;
+
+            this.Delimiter = string.Empty;
+
+            this.Keys = new List<Key>();
         }
 
-        public static Profile CreateFromXml(XmlReader xmlString, string defaultPath)
+        public static Profile CreateFromXml(XmlReader xmlReader, string defaultPath, string delimiter)
         {
             // Create a new profile
             Profile profile = new Profile();
 
             string currentElement = string.Empty;
+            string parentElement = string.Empty;
+            string typeAttribute = string.Empty;
 
             // Loop through the xml
-            while (xmlString.Read())
+            while (xmlReader.Read())
             {
-                switch (xmlString.NodeType)
+                switch (xmlReader.NodeType)
                 {
                     case XmlNodeType.Element:
-                        currentElement = xmlString.Name;
+                        if (xmlReader.Name == "EmailBody")
+                        {
+                            bool saveBool;
+                            bool.TryParse(xmlReader.GetAttribute("Save"), out saveBool);
+                            profile.SaveEmailBody = saveBool;
+                        }
+
+                        if (xmlReader.Name == "Keys")
+                            parentElement = xmlReader.Name;
+
+                        if (parentElement == "Keys")
+                        {
+                            typeAttribute = xmlReader.GetAttribute("Type");
+                        }
+
+                        currentElement = xmlReader.Name;
                         break;
                     case XmlNodeType.Text:
                         if (currentElement == "Name")
-                            profile.Name = xmlString.Value;
+                            profile.Name = xmlReader.Value;
                         
                         if (currentElement == "EmailSubject")
-                            profile.EmailSubject = xmlString.Value;
+                            profile.EmailSubject = xmlReader.Value;
 
                         if (currentElement == "EmailBody")
-                            profile.EmailBody = xmlString.Value;
+                            profile.EmailBody = xmlReader.Value;
 
                         if (currentElement == "SavePath")
-                            profile.SavePath = xmlString.Value;
+                            profile.SavePath = xmlReader.Value;
 
                         if (currentElement == "Id")
-                            profile.Id = xmlString.Value;
+                            profile.Id = xmlReader.Value;
+
+                        if (currentElement == "KeyDelimiter")
+                            profile.Delimiter = xmlReader.Value;
 
                         if (currentElement == "SaveAttachments")
                         {
                             bool saveBool;
-                            bool.TryParse(xmlString.Value, out saveBool);
+                            bool.TryParse(xmlReader.Value, out saveBool);
                             profile.SaveAttachments = saveBool;
                         }
 
-                        if (currentElement == "SaveBody")
+                        if (parentElement.Length > 0 && parentElement != currentElement)
                         {
-                            bool saveBool;
-                            bool.TryParse(xmlString.Value, out saveBool);
-                            profile.SaveEmailBody = saveBool;
+                            profile.Keys.Add(new Key(currentElement, xmlReader.Value, typeAttribute));
                         }
 
                         break;
@@ -85,9 +113,17 @@ namespace Mail_Agent_Service
                 }
             }
 
-            if (profile.SavePath.Length == 0)
-                profile.SavePath = defaultPath;
+            if (profile.Delimiter.Length == 0)
+            {
+                profile.Delimiter = delimiter;
+            }
 
+            if (profile.SavePath.Length == 0)
+            {
+                profile.SavePath = defaultPath;
+                profile.IsDefaultPath = true;
+            }
+                
             if (profile.Id.Length == 0)
             {
                 profile.Id = (Path.GetRandomFileName().Replace('.', '_') +

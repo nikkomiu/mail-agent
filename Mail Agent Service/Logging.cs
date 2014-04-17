@@ -42,9 +42,7 @@ namespace Mail_Agent_Service
         {
             if (this.IsLogLevelHighEnough(logLevel))
             {
-                fManager.Read();
                 fManager.Append(LineText(logLevel) + logText);
-                fManager.Save();
             }
         }
 

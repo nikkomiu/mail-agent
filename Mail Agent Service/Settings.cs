@@ -41,11 +41,11 @@ namespace Mail_Agent_Service
 
                         if (xReader.Name == "Profile")
                         {
-                            Profiles.Add(Profile.CreateFromXml(xReader.ReadSubtree(), this.General["DefaultSavePath"]));
+                            Profiles.Add(Profile.CreateFromXml(xReader.ReadSubtree(), this.General["DefaultSavePath"], this.General["ExportKeyDelimiter"]));
                         }
 
                         // Set parent to current element if it is a general subgroup
-                        if ((xReader.Name == "Mail" || xReader.Name == "Log") && groupElement == "General")
+                        if ((xReader.Name == "Mail" || xReader.Name == "Log") && groupElement == "General" || xReader.Name == "Export")
                         {
                             parentElement = xReader.Name;
                         }
@@ -69,6 +69,7 @@ namespace Mail_Agent_Service
                 }
             }
 
+            // Add 3 zeros to make MailPolling milliseconds instead of seconds
             General["MailPolling"] += "000";
 
             fManager = null;

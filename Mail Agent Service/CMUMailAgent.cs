@@ -73,11 +73,13 @@ namespace Mail_Agent_Service
 
                     Thread.Sleep(threadSleep);
                 }
+
                 // Catch exception for thread abort (OnStop)
-                catch (ThreadAbortException ex)
+                catch (ThreadAbortException)
                 {
                     Log.WriteLine(Logging.Level.WARNING, "Thread exiting!");
                 }
+
                 // Catch other general exceptions
                 catch (Exception ex)
                 {
@@ -86,10 +88,10 @@ namespace Mail_Agent_Service
                 }
 
                 // Garbage collection
-                Log.WriteLine(Logging.Level.DEBUG, "Memory Free: " + GC.GetTotalMemory(false));
+                Log.WriteLine(Logging.Level.DEBUG, "Memory Allocated (Before): " + GC.GetTotalMemory(false));
                 Log.WriteLine(Logging.Level.DEBUG, "Collecting Garbage...");
                 GC.Collect();
-                Log.WriteLine(Logging.Level.DEBUG, "Memory Free: " + GC.GetTotalMemory(true));
+                Log.WriteLine(Logging.Level.DEBUG, "Memory Allocated (After) : " + GC.GetTotalMemory(true));
             }
         }
     }

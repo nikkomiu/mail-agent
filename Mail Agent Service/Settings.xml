@@ -57,23 +57,69 @@
     </Mail>
     <!-- The default path to save email files. Requires a trailing \ -->
     <DefaultSavePath>\\imageapp-test\c$\Users\miu2n\Desktop\</DefaultSavePath>
+
+    <Export>
+      <!-- The name of the indexing file -->
+      <Filename>Export.idx</Filename>
+      
+      <!-- The delimiter to seperate fields for the document -->
+      <KeyDelimiter>^</KeyDelimiter>
+    </Export>
   </General>
   <Profiles>
     <Profile>
+      <!-- The name of the profile -->
       <Name>Profile 1</Name>
+      
+      <!-- The subject substring to match -->
       <EmailSubject></EmailSubject>
-      <EmailBody>Document</EmailBody>
+      
+      <!-- The body substring to match -->
+      <EmailBody Save="True">Document</EmailBody>
+      
+      <!-- Boolean for save attachments -->
       <SaveAttachments>False</SaveAttachments>
-      <SaveBody>True</SaveBody>
-      <!--<SavePath>\\imageapp-res\miu2n-download\</SavePath>-->
+
+      <!-- The save path is an optional global override -->
+      <!-- <SavePath></SavePath> -->
+
+      <!-- The delimiter is an optional global override -->
+      <!-- <KeyDelimiter></KeyDelimiter> -->
+      
+      <!--
+        Keys (from top to bottom in order) to use in the index file.
+          Set Type to Manual for static text that goes in the key.
+          Set Type to Search to search for text in the email body
+          Set Type to Dynamic to set one of the 'dynamic' fields:
+            - DATETIME
+            - DATE
+            - TIME
+        -->
+      <Keys>
+        <Drawer Type="Static">OIT-TC-View</Drawer>
+        <Field1 Type="Search"></Field1>
+        <Field2 Type="Search"></Field2>
+        <Field3 Type="Search"></Field3>
+        <Field4 Type="Search"></Field4>
+        <Field5 Type="Search"></Field5>
+        <DocType Type="Static">OIT-TC-A Document Type</DocType>
+      </Keys>
     </Profile>
     <Profile>
       <Name>Profile 2</Name>
       <EmailSubject>INMA:</EmailSubject>
-      <EmailBody></EmailBody>
+      <EmailBody Save="True"></EmailBody>
       <SaveAttachments>True</SaveAttachments>
-      <SaveBody>False</SaveBody>
       <SavePath>\\imageapp-res\miu2n-download\</SavePath>
+      <Keys>
+        <Drawer Manual="True">OIT-TC-View</Drawer>
+        <Field1 Manual="False"></Field1>
+        <Field2></Field2>
+        <Field3></Field3>
+        <Field4></Field4>
+        <Field5></Field5>
+        <DocType></DocType>
+      </Keys>
     </Profile>
   </Profiles>
 </Settings>

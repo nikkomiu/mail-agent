@@ -9,7 +9,7 @@ namespace Mail_Agent_Service
 {
     public class ExchangeServer
     {
-        private ExchangeService exService;
+        private ExchangeService ExService;
 
         private FolderId ErrorFolderId;
         private string ErrorFolderName;
@@ -17,24 +17,27 @@ namespace Mail_Agent_Service
         private FolderId SuccessFolderId;
         private string SuccessFolderName;
 
+        private string ExportFilename;
+        private string GlobalSavePath;
+
         public ExchangeServer(Dictionary<string, string> settings)
         {
             // Set the version of Exchange from settings file
-            this.exService = new ExchangeService(GetVersionFromString(settings["MailExchangeVersion"]));
+            this.ExService = new ExchangeService(GetVersionFromString(settings["MailExchangeVersion"]));
 
             // If not using windows credentials (from settings file) use manually define credentials
             if (settings["MailUseWindowsCredentials"].ToUpper() == "TRUE")
             {
                 // Use Windows Credentials
-                exService.UseDefaultCredentials = true;
+                ExService.UseDefaultCredentials = true;
             }
             else
             {
                 // Do not use Windows Credentials
-                exService.UseDefaultCredentials = false;
+                ExService.UseDefaultCredentials = false;
 
                 // Set the login credentials
-                exService.Credentials = new NetworkCredential(settings["MailEmail"], settings["MailPassword"]);
+                ExService.Credentials = new NetworkCredential(settings["MailEmail"], settings["MailPassword"]);
             }
 
 
@@ -42,33 +45,39 @@ namespace Mail_Agent_Service
             if (settings["MailUrl"].ToUpper() == "AUTO")
             {
                 // Autodiscover based on email address
-                exService.AutodiscoverUrl(settings["MailEmail"]);
+                ExService.AutodiscoverUrl(settings["MailEmail"]);
             }
             else
             {
                 // Set the URL manually
-                exService.Url = new Uri(settings["MailUrl"]);
+                ExService.Url = new Uri(settings["MailUrl"]);
             }
 
             // Set the error folder name from the settings
             ErrorFolderName = settings["MailErrorFolder"];
             SuccessFolderName = settings["MailSuccessFolder"];
+            ExportFilename = settings["ExportFilename"];
+            GlobalSavePath = settings["DefaultSavePath"];
         }
 
         public void SaveMail(List<Profile> Profiles, Logging log)
         {
-            FindItemsResults<Item> inboxItems = exService.FindItems(WellKnownFolderName.Inbox, new ItemView(100));
+            // Get all of the mailbox items
+            FindItemsResults<Item> inboxItems = ExService.FindItems(WellKnownFolderName.Inbox, new ItemView(100));
 
+            // List of mailbox items that have been processed
             List<Item> completeInboxItems = new List<Item>();
+
+            string globalExportText = string.Empty;
 
             foreach (Profile profile in Profiles)
             {
+                string localExportText = string.Empty;
+
                 foreach (Item mailItem in inboxItems)
                 {
                     try
                     {
-                        // TODO: Make sure the email should be used by this profile
-
                         // Log the subject of the email being processed
                         log.WriteLine(Logging.Level.DEBUG, mailItem.Subject);
 
@@ -123,6 +132,13 @@ namespace Mail_Agent_Service
                             }
                         }
 
+                        foreach (Key k in profile.Keys)
+                        {
+                            localExportText += k.ToDynamicString(profile.Delimiter, mailItem.Body);
+                        }
+
+                        localExportText += "\r\n";
+
                         // Move the email to the deleted items folder
                         MoveItemToFolder(mailItem, SuccessFolderName, SuccessFolderId);
                         log.WriteLine(Logging.Level.INFO, "Moved " + mailItem.Subject + " to " + SuccessFolderName + " folder");
@@ -138,7 +154,21 @@ namespace Mail_Agent_Service
 
                     completeInboxItems.Add(mailItem);
                 }
+
+                if (!profile.IsDefaultPath)
+                {
+                    // Write the index file
+                    File.WriteAllText(profile.SavePath + ExportFilename, localExportText);
+                }
+                else
+                {
+                    // Add the items to the global list
+                    globalExportText += localExportText;
+                }
             }
+
+            // Write the global index file
+            File.WriteAllText(GlobalSavePath + ExportFilename, globalExportText);
 
             // Move the items still in the inbox to the error folder
             foreach (Item mailItem in inboxItems)
@@ -177,7 +207,7 @@ namespace Mail_Agent_Service
             folders.Traversal = FolderTraversal.Deep;
 
             // Get the folders collection
-            FindFoldersResults folderResults = exService.FindFolders(WellKnownFolderName.Root, folders);
+            FindFoldersResults folderResults = ExService.FindFolders(WellKnownFolderName.Root, folders);
 
             // Loop through the folders until the correct one is found
             foreach (Folder f in folderResults)
