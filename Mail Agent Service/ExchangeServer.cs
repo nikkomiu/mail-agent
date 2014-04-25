@@ -71,8 +71,10 @@ namespace Mail_Agent_Service
 
             foreach (Profile profile in Profiles)
             {
+                // Create a new temporary string for writing the output
                 string localExportText = string.Empty;
 
+                // Loop through all of the mail items that are in the inbox
                 foreach (Item mailItem in inboxItems)
                 {
                     try
