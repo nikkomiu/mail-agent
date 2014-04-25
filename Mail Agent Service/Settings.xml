@@ -26,7 +26,7 @@
     </Log>
     <Mail>
       <!-- The rate to check the account (in seconds) -->
-      <Polling>10</Polling>
+      <Polling>900</Polling>
       
       <!--
         The version of Exchange that EWS is using. Default: 2010
@@ -56,11 +56,11 @@
       <Url>Auto</Url>
     </Mail>
     <!-- The default path to save email files. Requires a trailing \ -->
-    <DefaultSavePath>\\imageapp-test\c$\Users\miu2n\Desktop\</DefaultSavePath>
+    <DefaultSavePath>\\imageapp-test\d$\inserver6\temp\import\MailAgentImport\</DefaultSavePath>
 
     <Export>
       <!-- The name of the indexing file -->
-      <Filename>Export.idx</Filename>
+      <Filename>export.hdf</Filename>
       
       <!-- The delimiter to seperate fields for the document -->
       <KeyDelimiter>^</KeyDelimiter>
@@ -111,7 +111,7 @@
       <EmailSubject>INMA:</EmailSubject>
       <EmailBody Save="True"></EmailBody>
       <SaveAttachments>True</SaveAttachments>
-      <SavePath>\\imageapp-res\miu2n-download\</SavePath>
+      <!--<SavePath>\\imageapp-res\miu2n-download\</SavePath>-->
       <Keys>
         <Drawer Type="Static">OIT-TC-View</Drawer>
         <Field1 Type="Static">aaa</Field1>

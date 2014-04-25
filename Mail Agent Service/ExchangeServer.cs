@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Text;
 
 namespace Mail_Agent_Service
 {
@@ -68,8 +69,6 @@ namespace Mail_Agent_Service
             // List of mailbox items that have been processed
             List<Item> completeInboxItems = new List<Item>();
 
-            string globalExportText = string.Empty;
-
             foreach (Profile profile in Profiles)
             {
                 string localExportText = string.Empty;
@@ -85,74 +84,32 @@ namespace Mail_Agent_Service
                         mailItem.Load();
 
                         // If the profile has an email subject to match then check the email subject for the string
-                        if (profile.EmailSubject.Length > 0)
+                        // and if the email subject does not contain the profile subject skip the current email
+                        if (profile.EmailSubject.Length > 0 && !mailItem.Subject.Contains(profile.EmailSubject))
                         {
-                            // If the email subject does not contain the profile subject skip the current email
-                            if (!mailItem.Subject.Contains(profile.EmailSubject))
-                            {
-                                continue;
-                            }
+                            continue;
                         }
 
                         // If the profile has an email body to match then check the email body for the string
-                        if (profile.EmailBody.Length > 0)
+                        // and if the email body does not contain the profile body skip the current email
+                        if (profile.EmailBody.Length > 0 && !mailItem.Body.Text.Contains(profile.EmailBody))
                         {
-                            // If the email body does not contain the profile body skip the current email
-                            if (!mailItem.Body.Text.Contains(profile.EmailBody))
-                            {
-                                continue;
-                            }
+                            continue;
                         }
-
+                        
                         // Save the body if the profile wants it saved
                         if (profile.SaveEmailBody)
                         {
-                            // Get a number only timestamp
-                            long time = DateTime.Now.ToFileTime();
-                            
-                            // Save the file to the settings location with a filename of emailbody_{{timestamp}}.html
-                            string emailFilename = "emailbody_" + time + ".html";
-                            
-                            File.WriteAllText(profile.SavePath + emailFilename, mailItem.Body);
-                            log.WriteLine(Logging.Level.INFO, "Email body was written to " + profile.SavePath + " with the filename " + emailFilename);
-
-                            localExportText += emailFilename + profile.Delimiter;
-
-                            foreach (Key k in profile.Keys)
-                            {
-                                localExportText += k.ToDynamicString(profile.Delimiter, mailItem.Body);
-                            }
-
-                            localExportText += "\r\n";
+                            localExportText += WriteEmailBodyForProfile(mailItem, profile);
                         }
 
                         // Save the attachments if the profile wants them saved
                         if (mailItem.HasAttachments && profile.SaveAttachments)
                         {
-                            // Get the attachments collection
-                            AttachmentCollection mailAttachments = mailItem.Attachments;
-
-                            foreach (FileAttachment attachment in mailAttachments)
-                            {
-                                // Load the attachment
-                                attachment.Load();
-
-                                // Save the attachment to the location defined in the settings
-                                File.WriteAllBytes(profile.SavePath + attachment.Name, attachment.Content);
-                                log.WriteLine(Logging.Level.INFO, "Attachment " + attachment.Name + " was written to " + profile.SavePath);
-
-                                localExportText += attachment.Name + profile.Delimiter;
-
-                                foreach (Key k in profile.Keys)
-                                {
-                                    localExportText += k.ToDynamicString(profile.Delimiter, mailItem.Body);
-                                }
-
-                                localExportText += "\r\n";
-                            }
+                            localExportText += WriteAttachmentsForProfile(mailItem, profile);
                         }
 
-                        // Move the email to the deleted items folder
+                        // Move the email to the success folder
                         MoveItemToFolder(mailItem, SuccessFolderName, SuccessFolderId);
                         log.WriteLine(Logging.Level.INFO, "Moved " + mailItem.Subject + " to " + SuccessFolderName + " folder");
                     }
@@ -165,27 +122,16 @@ namespace Mail_Agent_Service
                         MoveItemToFolder(mailItem, ErrorFolderName, ErrorFolderId);
                     }
 
+                    // Add the item to the complete list
                     completeInboxItems.Add(mailItem);
                 }
 
+                // Write the export file if there were emails processed and completed
                 if (completeInboxItems.Count > 0 && localExportText.Length > 0)
                 {
-                    if (!profile.IsDefaultPath)
-                    {
-                        File.WriteAllText(profile.SavePath + DateTime.Now.ToFileTime() + ExportFilename, localExportText);
-                    }
-                    else
-                    {
-                        // Add the items to the global list
-                        globalExportText += localExportText;
-                    }
+                    // Write the export file to the profile's save path
+                    File.WriteAllText(profile.SavePath + DateTime.Now.ToFileTime() + ExportFilename, localExportText);
                 }
-            }
-
-            if (completeInboxItems.Count > 0 && globalExportText.Length > 0)
-            {
-                // Append to the existing index file
-                File.WriteAllText(GlobalSavePath + DateTime.Now.ToFileTime() + ExportFilename, globalExportText);
             }
 
             // Move the items still in the inbox to the error folder
@@ -200,6 +146,64 @@ namespace Mail_Agent_Service
                 // Move the email to the error folder
                 MoveItemToFolder(mailItem, ErrorFolderName, ErrorFolderId);
             }
+        }
+
+        private string WriteEmailBodyForProfile(Item mailItem, Profile profile)
+        {
+            StringBuilder builder = new StringBuilder();
+
+            // Get a number only timestamp
+            long time = DateTime.Now.ToFileTime();
+
+            // Save the file to the settings location with a filename of emailbody_{{timestamp}}.html
+            string emailFilename = "emailbody_" + time + ".html";
+
+            File.WriteAllText(profile.SavePath + emailFilename, mailItem.Body);
+            
+            foreach (Key k in profile.Keys)
+            {
+                builder.Append(k.ToDynamicString(profile.Delimiter, mailItem.Body));
+            }
+
+            // Append the file name to exporting string
+            builder.Append(emailFilename);
+
+            // Add a new line per individual item
+            builder.Append("\r\n");
+
+            return builder.ToString();
+        }
+
+        private string WriteAttachmentsForProfile(Item mailItem, Profile profile)
+        {
+            StringBuilder builder = new StringBuilder();
+
+            // Get the attachments collection
+            AttachmentCollection mailAttachments = mailItem.Attachments;
+
+            foreach (FileAttachment attachment in mailAttachments)
+            {
+                // Load the attachment
+                attachment.Load();
+
+                // Save the attachment to the location defined in the settings
+                File.WriteAllBytes(profile.SavePath + attachment.Name, attachment.Content);
+                
+                // Foreach of the profile keys append the values to the export file
+                foreach (Key k in profile.Keys)
+                {
+                    // Append the key value
+                    builder.Append(k.ToDynamicString(profile.Delimiter, mailItem.Body));
+                }
+
+                // Append the filename of the attachment
+                builder.Append(attachment.Name);
+
+                // Append a new line at the end of every item processed
+                builder.Append("\r\n");
+            }
+
+            return builder.ToString();
         }
 
         private void MoveItemToFolder(Item mailItem, string folderName, FolderId folderId = null)
