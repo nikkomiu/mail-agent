@@ -42,7 +42,7 @@ namespace Mail_Agent_Service
             this.Keys = new List<Key>();
         }
 
-        public static Profile CreateFromXml(XmlReader xmlReader, string defaultPath, string delimiter)
+        public static Profile CreateFromXml(XmlReader xmlReader, string defaultPath, string delimiterParam)
         {
             // Create a new profile
             Profile profile = new Profile();
@@ -115,7 +115,7 @@ namespace Mail_Agent_Service
 
             if (profile.Delimiter.Length == 0)
             {
-                profile.Delimiter = delimiter;
+                profile.Delimiter = delimiterParam;
             }
 
             if (profile.SavePath.Length == 0)
