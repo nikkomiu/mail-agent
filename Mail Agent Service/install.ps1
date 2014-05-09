@@ -1,4 +1,4 @@
-﻿Param([string]$serviceName, [string]$exePath, [string]$username, [string]$password)
+﻿Param([string]$serviceName, [string]$exePath, [string]$username, [string]$password, [string]$uninstall)
 
 if (!$serviceName)
 {
@@ -17,14 +17,37 @@ if (!$username -or !$password)
     return;
 }
 
+$existingService = Get-WmiObject -Class Win32_Service -Filter "Name='$serviceName'"
+
+if ($uninstall)
+{
+	if ($existingService)
+	{
+		"'$serviceName' exists already. Stopping."
+		Stop-Service $serviceName
+		"Waiting 3 seconds to allow existing service to stop."
+		Start-Sleep -s 3
+
+		$existingService.Delete()
+		"Waiting 5 seconds to allow service to be uninstalled."
+		Start-Sleep -s 5
+	
+		"Uninstalled Service."
+	}
+	else
+	{
+		"Could not uninstall service."
+	}
+	
+	return;
+}
+
 Write-Host "Creating Service: " $serviceName
 Write-Host "  Path: " $exePath
 Write-Host "  Username: " $username
 
 $encPassword = convertto-securestring -String $password -AsPlainText -Force  
 $cred = new-object -typename System.Management.Automation.PSCredential -argumentlist $username, $encPassword
-
-$existingService = Get-WmiObject -Class Win32_Service -Filter "Name='$serviceName'"
 
 $scriptPath = split-path -parent $MyInvocation.MyCommand.Definition
 
