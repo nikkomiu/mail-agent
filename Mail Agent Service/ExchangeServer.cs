@@ -212,13 +212,13 @@ namespace Mail_Agent_Service
         {
             // If the folder id is null get the folder id by the folder name
             if (folderId == null)
-                folderId = GetFolderByName(folderName);
+                folderId = FindOrCreateFolderByName(folderName);
 
             // Move the message to the folder
             mailItem.Move(folderId);
         }
 
-        private FolderId GetFolderByName(string folderName)
+        private FolderId FindOrCreateFolderByName(string folderName, bool recurse = false)
         {
             // Get the top 100 folders for the email account
             FolderView folders = new FolderView(100);
@@ -236,8 +236,26 @@ namespace Mail_Agent_Service
             // Loop through the folders until the correct one is found
             foreach (Folder f in folderResults)
             {
+                // If the current folder's display name is equal to the passed folder value
                 if (f.DisplayName == folderName)
+                    // Return the id of the folder
                     return f.Id;
+            }
+
+            // If this is the second call to the function skip trying to create the folder again
+            if (!recurse)
+            {
+                // Create a new folder with the excahnge service
+                Folder newFolder = new Folder(ExService);
+
+                // Set the new folder's display name to the passed folder string value
+                newFolder.DisplayName = folderName;
+
+                // Save the new folder with the parent being the Inbox
+                newFolder.Save(WellKnownFolderName.Inbox);
+
+                // Call this function again to get the newly created folder id
+                FindOrCreateFolderByName(folderName, true);
             }
 
             // Return null if the folder is not real
