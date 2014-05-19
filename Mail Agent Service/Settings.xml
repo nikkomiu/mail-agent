@@ -72,9 +72,11 @@
       <Name>Profile 1</Name>
       
       <!-- The subject substring to match -->
+      <!-- Recommended: Use API:<<sha of profile name>> to ensure unique values -->
       <EmailSubject></EmailSubject>
       
       <!-- The body substring to match -->
+      <!-- Use the attribute Save="True" to save the body of the email to the output directory of the profile -->
       <EmailBody Save="True">Document</EmailBody>
       
       <!-- Boolean for save attachments -->
