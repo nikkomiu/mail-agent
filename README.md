@@ -12,7 +12,7 @@ Install the EWS API on the server that will be running the Mail Agent Service.
 
 ## Service Installation
 
-To install Mail Agent run the PowerShell Script (**As Administrator**) that is in the directory to create the Windows Service:
+To install Mail Agent run the PowerShell Script **(As Administrator)** that is in the directory to create the Windows Service:
 
     PS> .\install.ps1 -username=windows_user -password=user_password
 
