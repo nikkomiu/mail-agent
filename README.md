@@ -123,18 +123,22 @@ The profile keys are a list of the keys that you want to save in the Export file
 *Example:*
 
 Settings:
+
 ```xml
 ...
+<EmailBody Save="True"></EmailBody>
 <KeyDelimiter>,</KeyDelimiter>
 <Keys>
   <Attr1 Type="Static">Static Text</Attr1>
   <Attr2 Type="Dynamic">NULL</Attr2>
   <Attr3 Type="Search">Name:</Attr3>
   <Attr4 Type="Search">Phone:</Attr4>
-  <Attr5 Type="Dynamic">DATETIME</Attr5>
+  <Attr5 Type="Dynamic">DATE</Attr5>
 </Keys>
 ...
 ```
+
+Email HTML Body:
 
 ```html
 ...
@@ -143,12 +147,8 @@ Settings:
 ...
 ```
 
-```
+Export File:
 
 ```
-
-
-
-
-
-
+Static Text,,Johnny,123-456-7890,02/24/2014,output_20140224061014.html
+```
