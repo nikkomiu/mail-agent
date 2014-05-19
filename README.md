@@ -77,7 +77,7 @@ The default path that the files will be saved for the Mail Agent profiles. Can a
 
 The export is where you can define the file that contains the 'keys' or attributes of the email message to save.
 
-- `Filename`: The filename to use when exporting files.
+- `Filename`: The filename to use when exporting files. UNC Paths are allowed as long as the user running the Windows Service has access to the UNC Path
 - `KeyDelimiter`: The character that is going to be used to separate the keys in the export file.
 
 ### Profiles
@@ -119,3 +119,36 @@ The profile keys are a list of the keys that you want to save in the Export file
         - `TIME`: Creates a timestamp for the field 
         - `NULL`: Makes the field black (used for an empty placeholder)
     - `Search`: Looks inside the email body for the designated text inside of the element tag and gets the value after the tag and before the newline
+
+*Example:*
+
+Settings:
+```xml
+...
+<KeyDelimiter>,</KeyDelimiter>
+<Keys>
+  <Attr1 Type="Static">Static Text</Attr1>
+  <Attr2 Type="Dynamic">NULL</Attr2>
+  <Attr3 Type="Search">Name:</Attr3>
+  <Attr4 Type="Search">Phone:</Attr4>
+  <Attr5 Type="Dynamic">DATETIME</Attr5>
+</Keys>
+...
+```
+
+```html
+...
+<p>Name: <b>Johnny</b></p>
+<p>Phone: <b>123-456-7890</b></p>
+...
+```
+
+```
+
+```
+
+
+
+
+
+
