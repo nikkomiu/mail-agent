@@ -89,12 +89,12 @@ The profiles are where the individual actions take place based on email data. Th
 - `Name`: (Unique String) The name of the profile
 - `EmailSubject`: (String) The subject substring to match for the profile
     - **Recommendation:** Use a SHA1 value of the Name string to make sure that the emails have a unique value
+      In Terminal: echo -n "Profile Name" | openssl sha1
 - `EmailBody`: (String) The email body substring to match for the profile
     - `Save`: (True/False) Attribute for the EmailBody tag to allow saving the EmailBody
 - `SaveAttachments`: (True/False) Defines if the attachments should be saved or not
 - `SavePath`: (String) (Optional) Override for the globally defined save path
 - `KeyDelimiter`: (String) (Optional) Override for the globally defined delimiter
-- `SavePath`: (String) (Optional) Override for the globally defined save path
 
 You can set either EmailSubject or EmailBody to search for the search string or you can have both. The EmailSubject and EmailBody strings are used to make sure that the current profile is the correct profile to use for the email.
 
