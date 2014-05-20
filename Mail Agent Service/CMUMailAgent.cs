@@ -86,6 +86,7 @@ namespace Mail_Agent_Service
                     Log.WriteLine(Logging.Level.INFO, "Thread exiting!");
                 }
 
+                // Catch exception for Exchange XML Error
                 catch (Microsoft.Exchange.WebServices.Data.ServiceXmlDeserializationException ex)
                 {
                     // Output the more generic error to the logs
@@ -107,6 +108,7 @@ namespace Mail_Agent_Service
                     Log.WriteError(ex);
                 }
 
+                // Sleep for the set time in the settings
                 Thread.Sleep(threadSleep);
 
                 // Garbage collection
