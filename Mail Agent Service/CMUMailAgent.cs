@@ -47,8 +47,11 @@ namespace Mail_Agent_Service
             this.settings = new Settings();
             settings.Parse();
 
+            // Convert LogLocalLocation setting from string to bool
             bool localLocation;
             bool.TryParse(settings.General["LogLocalLocation"], out localLocation);
+
+            // Convert LogLevel from string to enum
             Logging.Level logLevel;
             Enum.TryParse(settings.General["LogLevel"], true, out logLevel);
 
@@ -70,14 +73,26 @@ namespace Mail_Agent_Service
                     ExchangeServer exchange = new ExchangeServer(settings.General);
 
                     exchange.SaveMail(settings.Profiles, Log);
-
-                    Thread.Sleep(threadSleep);
                 }
 
                 // Catch exception for thread abort (OnStop)
                 catch (ThreadAbortException)
                 {
-                    Log.WriteLine(Logging.Level.WARNING, "Thread exiting!");
+                    Log.WriteLine(Logging.Level.INFO, "Thread exiting!");
+                }
+
+                catch (Microsoft.Exchange.WebServices.Data.ServiceXmlDeserializationException ex)
+                {
+                    // Output the more generic error to the logs
+                    Log.WriteError(ex);
+
+                    // Output the slightly more specific error message to logs
+                    Log.WriteLine(Logging.Level.CRITICAL, "Exchange Web Service Encountered an error!");
+                    Log.WriteLine(Logging.Level.CRITICAL, "  This could be caused by a login failure.");
+                    Log.WriteLine(Logging.Level.CRITICAL, "  Check your connection information in the settings and restart the service.");
+
+                    // Quit the service because this error cannot be recovered from
+                    return;
                 }
 
                 // Catch other general exceptions
@@ -86,6 +101,8 @@ namespace Mail_Agent_Service
                     // Write the exception to the log
                     Log.WriteError(ex);
                 }
+
+                Thread.Sleep(threadSleep);
 
                 // Garbage collection
                 Log.WriteLine(Logging.Level.DEBUG, "Memory Allocated (Before): " + GC.GetTotalMemory(false));
