@@ -73,8 +73,6 @@ namespace Mail_Agent_Service
                     ExchangeServer exchange = new ExchangeServer(settings.General);
 
                     exchange.SaveMail(settings.Profiles, Log);
-
-                    Thread.Sleep(threadSleep);
                 }
 
                 // Catch exception for thread abort (OnStop)
@@ -102,6 +100,8 @@ namespace Mail_Agent_Service
                     // Write the exception to the log
                     Log.WriteError(ex);
                 }
+
+                Thread.Sleep(threadSleep);
 
                 // Garbage collection
                 Log.WriteLine(Logging.Level.DEBUG, "Memory Allocated (Before): " + GC.GetTotalMemory(false));
