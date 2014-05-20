@@ -131,7 +131,7 @@ namespace Mail_Agent_Service
                 if (completeInboxItems.Count > 0 && localExportText.Length > 0)
                 {
                     // Write the export file to the profile's save path
-                    File.WriteAllText(profile.SavePath + DateTime.Now.ToFileTime() + ExportFilename, localExportText);
+                    File.WriteAllText(profile.SavePath + DateTime.Now.ToFileTime() + "_" + ExportFilename, localExportText);
                 }
             }
 
