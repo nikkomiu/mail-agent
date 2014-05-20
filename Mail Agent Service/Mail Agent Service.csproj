@@ -107,6 +107,7 @@
       <DependentUpon>ProjectInstaller.cs</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ServiceThread.cs" />
     <Compile Include="Settings.cs" />
   </ItemGroup>
   <ItemGroup>
