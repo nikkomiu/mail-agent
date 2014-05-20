@@ -84,6 +84,8 @@ The export is where you can define the file that contains the 'keys' or attribut
 
 The profiles are where the individual actions take place based on email data. The profiles element contains a list of `Profile` elements.
 
+**Note:** After adding a new profile to Mail Agent you must restart the Mail Agent service, any emails that have not yet been processed will still be waiting when the service restarts.
+
 #### Profile Settings
 
 - `Name`: (Unique String) The name of the profile
