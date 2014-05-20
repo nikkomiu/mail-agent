@@ -12,6 +12,7 @@ namespace Mail_Agent_Service
     {
         public string Id { get; set; }
         public string Name { get; set; }
+        public bool Active { get; set; }
 
         public string EmailSubject { get; set; }
         public string EmailBody { get; set; }
@@ -92,6 +93,13 @@ namespace Mail_Agent_Service
 
                         if (currentElement == "KeyDelimiter")
                             profile.Delimiter = xmlReader.Value;
+
+                        if (currentElement == "Active")
+                        {
+                            bool activeBool = false;
+                            bool.TryParse(xmlReader.Value, out activeBool);
+                            profile.Active = activeBool;
+                        }
 
                         if (currentElement == "SaveAttachments")
                         {

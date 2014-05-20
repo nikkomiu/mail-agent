@@ -41,7 +41,12 @@ namespace Mail_Agent_Service
 
                         if (xReader.Name == "Profile")
                         {
-                            Profiles.Add(Profile.CreateFromXml(xReader.ReadSubtree(), this.General["DefaultSavePath"], this.General["ExportKeyDelimiter"]));
+                            Profile tmpProfile = Profile.CreateFromXml(xReader.ReadSubtree(), this.General["DefaultSavePath"], this.General["ExportKeyDelimiter"]);
+
+                            if (tmpProfile.Active)
+                            {
+                                Profiles.Add(tmpProfile);
+                            }
                         }
 
                         // Set parent to current element if it is a general subgroup

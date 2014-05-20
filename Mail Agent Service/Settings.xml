@@ -70,6 +70,7 @@
     <Profile>
       <!-- The name of the profile -->
       <Name>Profile 1</Name>
+      <Active>True</Active>
       
       <!-- The subject substring to match -->
       <!-- Recommended: Use API:<<sha of profile name>> to ensure unique values -->
@@ -110,6 +111,7 @@
     </Profile>
     <Profile>
       <Name>Profile 2</Name>
+      <Active>True</Active>
       <EmailSubject>INMA:</EmailSubject>
       <EmailBody Save="True"></EmailBody>
       <SaveAttachments>True</SaveAttachments>
