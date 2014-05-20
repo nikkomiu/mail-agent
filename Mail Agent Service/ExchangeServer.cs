@@ -79,7 +79,7 @@ namespace Mail_Agent_Service
                     try
                     {
                         // Log the subject of the email being processed
-                        log.WriteLine(Logging.Level.DEBUG, mailItem.Subject);
+                        log.WriteLine(Logging.Level.DEBUG, "Current Item (Subject): " + mailItem.Subject);
 
                         // Load the item to get the body + attachments
                         mailItem.Load();
