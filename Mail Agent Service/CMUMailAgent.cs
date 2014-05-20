@@ -47,8 +47,11 @@ namespace Mail_Agent_Service
             this.settings = new Settings();
             settings.Parse();
 
+            // Convert LogLocalLocation setting from string to bool
             bool localLocation;
             bool.TryParse(settings.General["LogLocalLocation"], out localLocation);
+
+            // Convert LogLevel from string to enum
             Logging.Level logLevel;
             Enum.TryParse(settings.General["LogLevel"], true, out logLevel);
 
