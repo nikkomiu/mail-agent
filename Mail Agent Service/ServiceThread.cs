@@ -115,7 +115,7 @@ namespace Mail_Agent_Service
                 lock (_lockObject)
                 {
                     // Sleep for the set time in the settings
-                    if (Monitor.Wait(_lockObject, new TimeSpan(0, 0, 0, 0, threadSleep)))
+                    if (Monitor.Wait(_lockObject, new TimeSpan(0, 0, 0, threadSleep)))
                     {
                         _log.WriteLine(Logging.Level.CRITICAL, "ABC");
                     }

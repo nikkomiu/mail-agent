@@ -74,9 +74,6 @@ namespace Mail_Agent_Service
                 }
             }
 
-            // Add 3 zeros to make MailPolling milliseconds instead of seconds
-            General["MailPolling"] += "000";
-
             fManager = null;
         }
     }
