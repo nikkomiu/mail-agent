@@ -40,6 +40,8 @@ namespace Mail_Agent_Service
 
             this.Delimiter = string.Empty;
 
+            this.Active = false;
+
             this.Keys = new List<Key>();
         }
 
