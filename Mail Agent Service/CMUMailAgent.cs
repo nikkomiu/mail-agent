@@ -19,11 +19,7 @@ namespace Mail_Agent_Service
 
         protected override void OnStart(string[] args)
         {
-            // Create a new thread for the thread loop
-            mainThread = new Thread(ThreadLoop);
-
-            // Start the thread loop
-            mainThread.Start();
+            this.Start();
         }
 
         protected override void OnStop()
@@ -35,6 +31,15 @@ namespace Mail_Agent_Service
 
             // Destroy the thread
             mainThread.Abort();
+        }
+
+        private void Start()
+        {
+            // Create a new thread for the thread loop
+            mainThread = new Thread(ThreadLoop);
+
+            // Start the thread loop
+            mainThread.Start();
         }
 
         private void ThreadLoop()
