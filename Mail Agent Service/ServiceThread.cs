@@ -17,24 +17,6 @@ namespace Mail_Agent_Service
         public ServiceThread()
         {
             _lockObject = new object();
-
-            // Parse the settings file
-            this._settings = new Settings();
-            _settings.Parse();
-
-            // Convert LogLocalLocation setting from string to bool
-            bool localLocation;
-            bool.TryParse(_settings.General["LogLocalLocation"], out localLocation);
-
-            // Convert LogLevel from string to enum
-            Logging.Level logLevel;
-            Enum.TryParse(_settings.General["LogLevel"], true, out logLevel);
-
-            // Setup the logging file
-            _log = new Logging(_settings.General["LogLocation"], logLevel, localLocation);
-
-            // Log the start of the thread with some settings information
-            _log.Begin(_settings.General);
         }
 
         public void Start()
@@ -76,6 +58,7 @@ namespace Mail_Agent_Service
             // Make the thread sleep long enough to attach a debugger to the process
             Thread.Sleep(10000);
 #endif
+            this.ThreadSetup();
 
             // Convert MailPolling variable into an int
             int threadSleep;
@@ -149,6 +132,27 @@ namespace Mail_Agent_Service
 
                 _log.WriteLine(Logging.Level.DEBUG, "Reached End of Thread Loop");
             }
+        }
+
+        private void ThreadSetup()
+        {
+            // Parse the settings file
+            this._settings = new Settings();
+            _settings.Parse();
+
+            // Convert LogLocalLocation setting from string to bool
+            bool localLocation;
+            bool.TryParse(_settings.General["LogLocalLocation"], out localLocation);
+
+            // Convert LogLevel from string to enum
+            Logging.Level logLevel;
+            Enum.TryParse(_settings.General["LogLevel"], true, out logLevel);
+
+            // Setup the logging file
+            _log = new Logging(_settings.General["LogLocation"], logLevel, localLocation);
+
+            // Log the start of the thread with some settings information
+            _log.Begin(_settings.General);
         }
     }
 }
