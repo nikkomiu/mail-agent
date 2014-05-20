@@ -69,22 +69,22 @@ namespace Mail_Agent_Service
 
         public void Begin(Dictionary<string, string> settings)
         {
-            this.WriteLine(Level.WARNING, "-----------------------------------------------------------");
-            this.WriteLine(Level.WARNING, "Process has started @ " + DateTime.Now.ToString());
+            this.WriteLine(Level.INFO, "-----------------------------------------------------------");
+            this.WriteLine(Level.INFO, "Process has started @ " + DateTime.Now.ToString());
 
             // Output Settings Information
-            this.WriteLine(Logging.Level.INFO, "Log Location:          " + settings["LogLocation"]);
-            this.WriteLine(Logging.Level.INFO, "Log Level:             " + settings["LogLevel"]);
-            this.WriteLine(Logging.Level.INFO, "Mail Polling Interval: " + settings["MailPolling"]);
+            this.WriteLine(Logging.Level.DEBUG, "Log Location:          " + settings["LogLocation"]);
+            this.WriteLine(Logging.Level.DEBUG, "Log Level:             " + settings["LogLevel"]);
+            this.WriteLine(Logging.Level.DEBUG, "Mail Polling Interval: " + settings["MailPolling"]);
 
-            this.WriteLine(Level.WARNING, "-----------------------------------------------------------");
+            this.WriteLine(Level.INFO, "-----------------------------------------------------------");
         }
 
         public void End()
         {
-            this.WriteLine(Level.WARNING, "-----------------------------------------------------------");
-            this.WriteLine(Level.WARNING, "Process has ended @ " + DateTime.Now.ToString());
-            this.WriteLine(Level.WARNING, "-----------------------------------------------------------");
+            this.WriteLine(Level.INFO, "-----------------------------------------------------------");
+            this.WriteLine(Level.INFO, "Process has ended @ " + DateTime.Now.ToString());
+            this.WriteLine(Level.INFO, "-----------------------------------------------------------");
         }
 
         private static string LineText(Level logLevel)

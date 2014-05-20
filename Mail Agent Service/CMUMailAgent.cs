@@ -78,7 +78,8 @@ namespace Mail_Agent_Service
                 // Catch exception for thread abort (OnStop)
                 catch (ThreadAbortException)
                 {
-                    Log.WriteLine(Logging.Level.WARNING, "Thread exiting!");
+                    Log.WriteLine(Logging.Level.INFO, "Thread exiting!");
+                }
 
                 catch (Microsoft.Exchange.WebServices.Data.ServiceXmlDeserializationException ex)
                 {
