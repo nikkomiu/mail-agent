@@ -1,10 +1,9 @@
-﻿using Microsoft.Exchange.WebServices;
-using Microsoft.Exchange.WebServices.Data;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
+using Microsoft.Exchange.WebServices.Data;
 
 namespace Mail_Agent_Service
 {
