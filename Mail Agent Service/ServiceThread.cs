@@ -115,19 +115,14 @@ namespace Mail_Agent_Service
                 lock (_lockObject)
                 {
                     // Sleep for the set time in the settings
-                    if (Monitor.Wait(_lockObject, new TimeSpan(0, 0, 0, threadSleep)))
-                    {
-                        _log.WriteLine(Logging.Level.CRITICAL, "ABC");
-                    }
-                    else
-                    {
-                        _log.WriteLine(Logging.Level.CRITICAL, "ABC");
-                    }
+                    Monitor.Wait(_lockObject, new TimeSpan(0, 0, 0, threadSleep));
 
                     // If there was a request to cancel the thread
                     if (_cancelToken.Token.IsCancellationRequested)
+                    {
                         // Exit the thread
                         return;
+                    }
                 }
 
                 _log.WriteLine(Logging.Level.DEBUG, "Reached End of Thread Loop");
