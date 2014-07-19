@@ -97,6 +97,7 @@
             - DATETIME
             - DATE
             - TIME
+            - INCREMENT
             - NULL
         -->
       <Keys>
