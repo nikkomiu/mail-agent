@@ -187,8 +187,19 @@ namespace Mail_Agent_Service
                 // Load the attachment
                 attachment.Load();
 
+                // Remove spaces and set filename to lowercase
+                string attachmentName = attachment.Name.ToLower().Replace(" ", "");
+
+                int extensionPosition = attachmentName.LastIndexOf(".");
+
+                // Get the extension
+                string attachmentExtension = attachmentName.Substring(extensionPosition);
+
+                // Rebuild the extension
+                attachmentName = attachmentName.Remove(extensionPosition) + "_" + DateTime.Now.ToFileTime() + attachmentExtension;
+
                 // Save the attachment to the location defined in the settings
-                File.WriteAllBytes(profile.SavePath + attachment.Name, attachment.Content);
+                File.WriteAllBytes(profile.SavePath + attachmentName, attachment.Content);
                 
                 // Foreach of the profile keys append the values to the export file
                 foreach (Key k in profile.Keys)
@@ -198,7 +209,7 @@ namespace Mail_Agent_Service
                 }
 
                 // Append the filename of the attachment
-                builder.Append(attachment.Name);
+                builder.Append(attachmentName);
 
                 // Append a new line at the end of every item processed
                 builder.Append("\r\n");
