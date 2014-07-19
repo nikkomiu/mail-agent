@@ -11,9 +11,12 @@ namespace Mail_Agent_Service
         public string Name { get; set; }
         public string Value { get; set; }
         public string Type { get; set; }
+
+        private int _increment;
         
         public Key(string name = "", string value = "", string type = "")
         {
+            _increment = 1;
             this.Name = name;
             this.Value = value;
             this.Type = type;
@@ -40,6 +43,12 @@ namespace Mail_Agent_Service
                 if (this.Value == "TIME" || this.Value == "DATETIME")
                 {
                     returnString += DateTime.Now.ToShortTimeString();
+                }
+
+                if (this.Value == "INCREMENT")
+                {
+                    returnString += _increment;
+                    _increment++;
                 }
             }
             else if (this.Type == "Search" && dynamicSearch.Length > 0)
