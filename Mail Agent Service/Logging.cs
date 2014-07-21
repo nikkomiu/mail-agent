@@ -11,8 +11,8 @@ namespace Mail_Agent_Service
         // Log Levels
         public enum Level { DEBUG = 5, INFO = 4, WARNING = 3, ERROR = 2, CRITICAL = 1, NONE = 0 }
 
-        private FileMan fManager;
-        private Level logLevel;
+        private FileMan _fileManager;
+        private Level _logLevel;
 
         public Logging() : this("debug.log", Level.DEBUG)
         {
@@ -21,7 +21,7 @@ namespace Mail_Agent_Service
         public Logging(string logName, Level logLevel, bool isLocalFile = true)
         {
             // Set the log level to output
-            this.logLevel = logLevel;
+            this._logLevel = logLevel;
 
             // Add datestamp to filename
             string[] splitLogName = logName.Split('.');
@@ -33,16 +33,16 @@ namespace Mail_Agent_Service
 
             // If it is a local file use a local path otherwise use an absolute path
             if (isLocalFile)
-                fManager = FileMan.LocalFile("logs\\" + logName);
+                _fileManager = FileMan.LocalFile("logs\\" + logName);
             else
-                fManager = new FileMan(logName);
+                _fileManager = new FileMan(logName);
         }
 
         public void Write(Level logLevel, string logText)
         {
             if (this.IsLogLevelHighEnough(logLevel))
             {
-                fManager.Append(LineText(logLevel) + logText);
+                _fileManager.Append(LineText(logLevel) + logText);
             }
         }
 
@@ -64,7 +64,7 @@ namespace Mail_Agent_Service
 
         private bool IsLogLevelHighEnough(Level outputLevel)
         {
-            return (logLevel >= outputLevel) ? true : false;
+            return (_logLevel >= outputLevel) ? true : false;
         }
 
         public void Begin(Dictionary<string, string> settings)

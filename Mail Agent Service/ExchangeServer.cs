@@ -9,35 +9,35 @@ namespace Mail_Agent_Service
 {
     public class ExchangeServer
     {
-        private ExchangeService ExService;
+        private ExchangeService _exService;
 
-        private FolderId ErrorFolderId;
-        private string ErrorFolderName;
+        private FolderId _errorFolderId;
+        private string _errorFolderName;
 
-        private FolderId SuccessFolderId;
-        private string SuccessFolderName;
+        private FolderId _successFolderId;
+        private string _successFolderName;
 
-        private string ExportFilename;
-        private string GlobalSavePath;
+        private string _exportFilename;
+        private string _globalSavePath;
 
         public ExchangeServer(Dictionary<string, string> settings)
         {
             // Set the version of Exchange from settings file
-            this.ExService = new ExchangeService(GetVersionFromString(settings["MailExchangeVersion"]));
+            this._exService = new ExchangeService(GetVersionFromString(settings["MailExchangeVersion"]));
 
             // If not using windows credentials (from settings file) use manually define credentials
             if (settings["MailUseWindowsCredentials"].ToUpper() == "TRUE")
             {
                 // Use Windows Credentials
-                ExService.UseDefaultCredentials = true;
+                _exService.UseDefaultCredentials = true;
             }
             else
             {
                 // Do not use Windows Credentials
-                ExService.UseDefaultCredentials = false;
+                _exService.UseDefaultCredentials = false;
 
                 // Set the login credentials
-                ExService.Credentials = new NetworkCredential(settings["MailEmail"], settings["MailPassword"]);
+                _exService.Credentials = new NetworkCredential(settings["MailEmail"], settings["MailPassword"]);
             }
 
 
@@ -45,25 +45,25 @@ namespace Mail_Agent_Service
             if (settings["MailUrl"].ToUpper() == "AUTO")
             {
                 // Autodiscover based on email address
-                ExService.AutodiscoverUrl(settings["MailEmail"]);
+                _exService.AutodiscoverUrl(settings["MailEmail"]);
             }
             else
             {
                 // Set the URL manually
-                ExService.Url = new Uri(settings["MailUrl"]);
+                _exService.Url = new Uri(settings["MailUrl"]);
             }
 
             // Set the error folder name from the settings
-            ErrorFolderName = settings["MailErrorFolder"];
-            SuccessFolderName = settings["MailSuccessFolder"];
-            ExportFilename = settings["ExportFilename"];
-            GlobalSavePath = settings["DefaultSavePath"];
+            _errorFolderName = settings["MailErrorFolder"];
+            _successFolderName = settings["MailSuccessFolder"];
+            _exportFilename = settings["ExportFilename"];
+            _globalSavePath = settings["DefaultSavePath"];
         }
 
         public void SaveMail(List<Profile> Profiles, Logging log)
         {
             // Get all of the mailbox items
-            FindItemsResults<Item> inboxItems = ExService.FindItems(WellKnownFolderName.Inbox, new ItemView(100));
+            FindItemsResults<Item> inboxItems = _exService.FindItems(WellKnownFolderName.Inbox, new ItemView(100));
 
             // List of mailbox items that have been processed
             List<Item> completeInboxItems = new List<Item>();
@@ -111,8 +111,8 @@ namespace Mail_Agent_Service
                         }
 
                         // Move the email to the success folder
-                        MoveItemToFolder(mailItem, SuccessFolderName, SuccessFolderId);
-                        log.WriteLine(Logging.Level.INFO, "Moved " + mailItem.Subject + " to " + SuccessFolderName + " folder");
+                        MoveItemToFolder(mailItem, _successFolderName, _successFolderId);
+                        log.WriteLine(Logging.Level.INFO, "Moved " + mailItem.Subject + " to " + _successFolderName + " folder");
                     }
                     catch (Exception ex)
                     {
@@ -120,18 +120,21 @@ namespace Mail_Agent_Service
                         log.WriteError(ex);
 
                         // Move the email to the error folder
-                        MoveItemToFolder(mailItem, ErrorFolderName, ErrorFolderId);
+                        MoveItemToFolder(mailItem, _errorFolderName, _errorFolderId);
                     }
 
                     // Add the item to the complete list
                     completeInboxItems.Add(mailItem);
+
+                    // Sleep so there is time between emails
+                    System.Threading.Thread.Sleep(5);
                 }
 
                 // Write the export file if there were emails processed and completed
                 if (completeInboxItems.Count > 0 && localExportText.Length > 0)
                 {
                     // Write the export file to the profile's save path
-                    File.WriteAllText(profile.SavePath + DateTime.Now.ToFileTime() + "_" + ExportFilename, localExportText);
+                    File.WriteAllText(profile.SavePath + DateTime.Now.ToFileTime() + DateTime.Now.Millisecond + "_" + _exportFilename, localExportText);
                 }
             }
 
@@ -145,7 +148,7 @@ namespace Mail_Agent_Service
                 }
 
                 // Move the email to the error folder
-                MoveItemToFolder(mailItem, ErrorFolderName, ErrorFolderId);
+                MoveItemToFolder(mailItem, _errorFolderName, _errorFolderId);
             }
         }
 
@@ -154,7 +157,7 @@ namespace Mail_Agent_Service
             StringBuilder builder = new StringBuilder();
 
             // Get a number only timestamp
-            long time = DateTime.Now.ToFileTime();
+            long time = DateTime.Now.ToFileTime() + DateTime.Now.Millisecond;
 
             // Save the file to the settings location with a filename of emailbody_{{timestamp}}.html
             string emailFilename = "emailbody_" + time + ".html";
@@ -187,19 +190,11 @@ namespace Mail_Agent_Service
                 // Load the attachment
                 attachment.Load();
 
-                // Remove spaces and set filename to lowercase
-                string attachmentName = attachment.Name.ToLower().Replace(" ", "");
-
-                int extensionPosition = attachmentName.LastIndexOf(".");
-
-                // Get the extension
-                string attachmentExtension = attachmentName.Substring(extensionPosition);
-
-                // Rebuild the extension
-                attachmentName = attachmentName.Remove(extensionPosition) + "_" + DateTime.Now.ToFileTime() + attachmentExtension;
+                string name = attachment.Name.Replace(" ", "").ToLower();
+                name = "_" + DateTime.Now.ToFileTime() + DateTime.Now.Millisecond + name;
 
                 // Save the attachment to the location defined in the settings
-                File.WriteAllBytes(profile.SavePath + attachmentName, attachment.Content);
+                File.WriteAllBytes(profile.SavePath + name, attachment.Content);
                 
                 // Foreach of the profile keys append the values to the export file
                 foreach (Key k in profile.Keys)
@@ -209,7 +204,7 @@ namespace Mail_Agent_Service
                 }
 
                 // Append the filename of the attachment
-                builder.Append(attachmentName);
+                builder.Append(name);
 
                 // Append a new line at the end of every item processed
                 builder.Append("\r\n");
@@ -241,7 +236,7 @@ namespace Mail_Agent_Service
             folders.Traversal = FolderTraversal.Deep;
 
             // Get the folders collection
-            FindFoldersResults folderResults = ExService.FindFolders(WellKnownFolderName.Root, folders);
+            FindFoldersResults folderResults = _exService.FindFolders(WellKnownFolderName.Root, folders);
 
             // Loop through the folders until the correct one is found
             foreach (Folder f in folderResults)
@@ -256,7 +251,7 @@ namespace Mail_Agent_Service
             if (!recurse)
             {
                 // Create a new folder with the excahnge service
-                Folder newFolder = new Folder(ExService);
+                Folder newFolder = new Folder(_exService);
 
                 // Set the new folder's display name to the passed folder string value
                 newFolder.DisplayName = folderName;
