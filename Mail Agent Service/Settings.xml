@@ -71,6 +71,9 @@
       <!-- The name of the profile -->
       <Name>Profile 1</Name>
       <Active>True</Active>
+
+      <!-- Use alias email address instead of default email address -->
+      <Alias>import@cmich.edu</Alias>
       
       <!-- The subject substring to match -->
       <!-- Recommended: Use API:<<sha of profile name>> to ensure unique values -->

@@ -14,6 +14,8 @@ namespace Mail_Agent_Service
         public string Name { get; set; }
         public bool Active { get; set; }
 
+        public string Alias { get; set; }
+
         public string EmailSubject { get; set; }
         public string EmailBody { get; set; }
 
