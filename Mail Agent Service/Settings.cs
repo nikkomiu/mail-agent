@@ -19,29 +19,29 @@ namespace Mail_Agent_Service
 
         public void Parse()
         {
-            FileMan fManager = FileMan.LocalFile("Settings.xml");
-            fManager.Read();
+            FileMan fileManager = FileMan.LocalFile("Settings.xml");
+            fileManager.Read();
 
-            XmlReader xReader = XmlReader.Create(new StringReader(fManager.FileContents));
+            XmlReader xmlReader = XmlReader.Create(new StringReader(fileManager.FileContents));
 
             string groupElement = string.Empty;
             string parentElement = string.Empty;
             string currentElement = string.Empty;
 
-            while (xReader.Read())
+            while (xmlReader.Read())
             {
-                switch (xReader.NodeType)
+                switch (xmlReader.NodeType)
                 {
                     case XmlNodeType.Element:
                         // Set the group if it is a general or profile group
-                        if (xReader.Name == "General" || xReader.Name == "Profiles")
+                        if (xmlReader.Name == "General" || xmlReader.Name == "Profiles")
                         {
-                            groupElement = xReader.Name;
+                            groupElement = xmlReader.Name;
                         }
 
-                        if (xReader.Name == "Profile")
+                        if (xmlReader.Name == "Profile")
                         {
-                            Profile tmpProfile = Profile.CreateFromXml(xReader.ReadSubtree(), this.General["DefaultSavePath"], this.General["ExportKeyDelimiter"]);
+                            Profile tmpProfile = Profile.CreateFromXml(xmlReader.ReadSubtree(), this.General["DefaultSavePath"], this.General["ExportKeyDelimiter"]);
 
                             if (tmpProfile.Active)
                             {
@@ -50,21 +50,21 @@ namespace Mail_Agent_Service
                         }
 
                         // Set parent to current element if it is a general subgroup
-                        if ((xReader.Name == "Mail" || xReader.Name == "Log") && groupElement == "General" || xReader.Name == "Export")
+                        if ((xmlReader.Name == "Mail" || xmlReader.Name == "Log") && groupElement == "General" || xmlReader.Name == "Export")
                         {
-                            parentElement = xReader.Name;
+                            parentElement = xmlReader.Name;
                         }
 
-                        currentElement = xReader.Name;
+                        currentElement = xmlReader.Name;
                         break;
                     case XmlNodeType.Text:
                         // If the element has a value save the value to parent + element name in dictionary
                         // Ex. Parent = Log, Element = Level, Dictionary Key = LogLevel
-                        if (xReader.HasValue)
+                        if (xmlReader.HasValue)
                         {
                             if (currentElement == "DefaultSavePath")
-                                this.General[currentElement] = xReader.Value;
-                            this.General[parentElement + currentElement] = xReader.Value;
+                                this.General[currentElement] = xmlReader.Value;
+                            this.General[parentElement + currentElement] = xmlReader.Value;
                         }
                         break;
                     case XmlNodeType.EndElement:
@@ -74,7 +74,7 @@ namespace Mail_Agent_Service
                 }
             }
 
-            fManager = null;
+            fileManager = null;
         }
     }
 }

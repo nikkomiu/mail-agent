@@ -13,12 +13,12 @@ namespace Mail_Agent_Service
         {
             get
             {
-                return this.fileContents;
+                return this._fileContents;
             }
         }
 
         // Internal file contents
-        private string fileContents;
+        private string _fileContents;
 
         public FileMan() : this(string.Empty)
         {
@@ -27,7 +27,7 @@ namespace Mail_Agent_Service
         public FileMan(string filePath)
         {
             this.FilePath = filePath;
-            this.fileContents = string.Empty;
+            this._fileContents = string.Empty;
         }
 
         public void Read()
@@ -39,7 +39,7 @@ namespace Mail_Agent_Service
                 if (!Directory.Exists(directory))
                     Directory.CreateDirectory(directory);
 
-                this.fileContents = File.ReadAllText(this.FilePath);
+                this._fileContents = File.ReadAllText(this.FilePath);
             }
             catch (FileNotFoundException)
             {
@@ -62,7 +62,7 @@ namespace Mail_Agent_Service
             StreamWriter writer = new StreamWriter(this.FilePath);
 
             // Write file contents
-            writer.Write(this.fileContents);
+            writer.Write(this._fileContents);
 
             // Close file writer
             writer.Flush();

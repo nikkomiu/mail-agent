@@ -81,6 +81,7 @@ namespace Mail_Agent_Service
                 // Catch exception for thread abort (OnStop)
                 catch (ThreadAbortException)
                 {
+                    // Should never happen...
                     _log.WriteLine(Logging.Level.ERROR, "Thread aborting!");
                 }
 
@@ -90,7 +91,7 @@ namespace Mail_Agent_Service
                     // Output the more generic error to the logs
                     _log.WriteError(ex);
 
-                    // Output the slightly more specific error message to logs
+                    // Output the probable cause to logs
                     _log.WriteLine(Logging.Level.CRITICAL, "Exchange Web Service Encountered an error!");
                     _log.WriteLine(Logging.Level.CRITICAL, "  This could be caused by a login failure.");
                     _log.WriteLine(Logging.Level.CRITICAL, "  Check your connection information in the settings and restart the service.");
