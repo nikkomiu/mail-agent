@@ -113,7 +113,7 @@ The profile keys are a list of the keys that you want to save in the Export file
         - `DATETIME`: Creates a date/time stamp for the field **(reccomended)**
         - `DATE`: Creates a datestamp for the field
         - `TIME`: Creates a timestamp for the field
-        - `INCREMENT`: Creates an increment of the individual files that are associated with an email **(to gaurantee unique indexes you will need this property)**
+        - `INCREMENT`: Creates an increment of the individual files that are associated with an email **(reccomended)** __(to gaurantee unique indexes you will need this property)__
         - `NULL`: Makes the field black (used for an empty placeholder)
     - `Search`: Looks inside the email body for the designated text inside of the element tag and gets the value after the tag and before the newline
 
