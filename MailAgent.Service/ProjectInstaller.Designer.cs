@@ -33,7 +33,7 @@
             // 
             // serviceProcessInstaller1
             // 
-            this.serviceProcessInstaller1.Account = System.ServiceProcess.ServiceAccount.LocalSystem;
+            this.serviceProcessInstaller1.Account = System.ServiceProcess.ServiceAccount.NetworkService;
             this.serviceProcessInstaller1.Password = null;
             this.serviceProcessInstaller1.Username = null;
             // 
@@ -41,8 +41,8 @@
             // 
             this.serviceInstaller1.Description = "Provides framework to transfer Microsoft Exchange emails and email attachments in" +
     "to files that get put into a directory on the system.";
-            this.serviceInstaller1.DisplayName = "CMU Mail Agent";
-            this.serviceInstaller1.ServiceName = "CMU Mail Agent";
+            this.serviceInstaller1.DisplayName = "Mail Agent";
+            this.serviceInstaller1.ServiceName = "Mail Agent";
             this.serviceInstaller1.StartType = System.ServiceProcess.ServiceStartMode.Automatic;
             // 
             // ProjectInstaller
