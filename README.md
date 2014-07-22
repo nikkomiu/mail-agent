@@ -10,6 +10,23 @@ You can also run the installer from the command prompt **as administrator**, nav
 MailAgent.exe -install
 ```
 
+If you specify a UNC path for the email content to be saved to, you will want/need to change the user that the service is running as to be a user that has write permission to the directory on the server.
+
+#### To change the user running the service:
+
+1. Open **Control Panel**
+    - If you are in the category view change the view format from Category to **Large Icons** or **Small Icons**
+2. Open **Administrative Tools**
+3. Open **Services**
+4. Find the service **Mail Agent** listed in Services
+5. **Right click** on the service and click **Properties**
+6. Go to the **Log On tab** in the Properties dialog box
+7. Change the Log on as to **This account**
+8. Either enter the account username in the this account box or click Browse... to the right of the this account box and browse for a user on the local system or the domain
+9. Enter the user's password in the password box and re-enter the user's password in the confirm password box
+10. Click **Apply**
+11. If the service was running before the change, you may need to restart the service for the changes to take effect.
+
 ## Uninstall
 
 To uninstall the service run command prompt **as administrator**, navigate to the directory that contains the `MailAgent.exe` file, then run:
