@@ -1,28 +1,22 @@
 # CMU Mail Agent
 
-## Details
+## Installation
 
-This mail agent service is for Exchange Web Services and is compatible with `Exchange 2007 SP1` and newer.
+To perform a quick install of the service run the `MailAgent.exe` file **as an administrator** to install the service to the system.
 
-## EWS 2.1 Installation
+You can also run the installer from the command prompt **as administrator**, navigate to the directory that contains the `MailAgent.exe` file, then run:
 
-Download Microsoft Exchange Web Services Managed API 2.1 from the Microsoft Download Center [Link to Download](http://www.microsoft.com/en-us/download/details.aspx?id=42022)
+```
+MailAgent.exe -install
+```
 
-Install the EWS API on the server that will be running the Mail Agent Service.
+## Uninstall
 
-## Service Installation
+To uninstall the service run command prompt **as administrator**, navigate to the directory that contains the `MailAgent.exe` file, then run:
 
-To install Mail Agent run the PowerShell Script **(As Administrator)** that is in the directory to create the Windows Service:
-
-    PS> .\install.ps1 -username=windows_user -password=user_password
-
-#### Script Parameters
-
-- (Required) `-username`: The Windows User that the service will run as (this can be changed later in Windows Services)
-- (Required) `-password`: The password for the Windows User that the service will run as
-- `-serviceName`: The name of the service to register in Windows Services (`Default`: CMU Mail Agent)
-- `-exePath`: The path to the Windows Service Executable that is being installed (`Default`: <<current_dir>>\cmuMailAgent.exe)
-- `-uninstall`: Used to uninstall the service (_does not require a value_)
+```
+MailAgent.exe -uninstall
+```
 
 ## Settings
 
@@ -116,9 +110,10 @@ The profile keys are a list of the keys that you want to save in the Export file
 - `Types`: There are 3 different types of attributes that you can have for the keys:
     - `Static`: The static type will generate the text that you have inside of the element tag
     - `Dynamic`: The dynamic type will generate 'dynamic' content based on the value inside the element tag, possible element tag values are:
-        - `DATETIME`: Creates a date/time stamp for the field
+        - `DATETIME`: Creates a date/time stamp for the field **(reccomended)**
         - `DATE`: Creates a datestamp for the field
-        - `TIME`: Creates a timestamp for the field 
+        - `TIME`: Creates a timestamp for the field
+        - `INCREMENT`: Creates an increment of the individual files that are associated with an email **(to gaurantee unique indexes you will need this property)**
         - `NULL`: Makes the field black (used for an empty placeholder)
     - `Search`: Looks inside the email body for the designated text inside of the element tag and gets the value after the tag and before the newline
 
