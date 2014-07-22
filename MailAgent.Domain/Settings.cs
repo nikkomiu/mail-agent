@@ -4,9 +4,9 @@ using System.Xml;
 using System.Text;
 using System.Collections.Generic;
 
-namespace MailAgent.Service
+namespace MailAgent.Domain
 {
-    class Settings
+    public class Settings
     {
         public Dictionary<string, string> General { get; set; }
         public List<Profile> Profiles { get; set; }

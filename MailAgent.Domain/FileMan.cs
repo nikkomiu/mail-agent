@@ -1,9 +1,9 @@
 ﻿using System;
 using System.IO;
 
-namespace MailAgent.Service
+namespace MailAgent.Domain
 {
-    class FileMan
+    public class FileMan
     {
         // Public file path
         public string FilePath { get; set; }

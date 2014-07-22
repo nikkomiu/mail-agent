@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 
-namespace MailAgent.Service
+namespace MailAgent.Domain
 {
     public class Profile
     {

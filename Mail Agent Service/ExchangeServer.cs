@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MailAgent.Domain;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
