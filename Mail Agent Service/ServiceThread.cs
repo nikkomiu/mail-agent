@@ -67,12 +67,27 @@ namespace Mail_Agent_Service
             // Loop "forever"
             while (true)
             {
+                // Convert LogLocalLocation setting from string to bool
+                bool localLocation;
+                bool.TryParse(_settings.General["LogLocalLocation"], out localLocation);
+
+                // Convert LogLevel from string to enum
+                Logging.Level logLevel;
+                Enum.TryParse(_settings.General["LogLevel"], true, out logLevel);
+
+                // Setup the logging file
+                _log = new Logging(_settings.General["LogLocation"], logLevel, localLocation);
+
                 _log.WriteLine(Logging.Level.DEBUG, "Reached Start of Thread Loop");
 
                 try
                 {
                     // Create a new ExchangeServer
+#if DEBUG
+                    ExchangeServer exchange = new ExchangeServer(_settings.General, _log);
+#else
                     ExchangeServer exchange = new ExchangeServer(_settings.General);
+#endif
 
                     // Save mail in Exchange
                     exchange.SaveMail(_settings.Profiles, _log);

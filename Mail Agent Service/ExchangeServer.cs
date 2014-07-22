@@ -4,6 +4,7 @@ using System.IO;
 using System.Net;
 using System.Text;
 using Microsoft.Exchange.WebServices.Data;
+using System.Text.RegularExpressions;
 
 namespace Mail_Agent_Service
 {
@@ -19,6 +20,13 @@ namespace Mail_Agent_Service
 
         private string _exportFilename;
         private string _globalSavePath;
+
+        private Logging _logger;
+
+        public ExchangeServer(Dictionary<string, string> settings, Logging logger) : this(settings)
+        {
+            this._logger = logger;
+        }
 
         public ExchangeServer(Dictionary<string, string> settings)
         {
@@ -83,6 +91,18 @@ namespace Mail_Agent_Service
 
                         // Load the item to get the body + attachments
                         mailItem.Load();
+                        
+                        // If the profile has an alias set and the email is not to the alias address
+                        // skip the current email
+                        if (profile.Alias != null && profile.Alias.Length > 0)
+                        {
+                            string toAddress = GetToAddress(mailItem);
+
+                            if (toAddress == null || !profile.Alias.Contains(toAddress))
+                            {
+                                continue;
+                            }
+                        }
 
                         // If the profile has an email subject to match then check the email subject for the string
                         // and if the email subject does not contain the profile subject skip the current email
@@ -134,7 +154,7 @@ namespace Mail_Agent_Service
                 if (completeInboxItems.Count > 0 && localExportText.Length > 0)
                 {
                     // Write the export file to the profile's save path
-                    File.WriteAllText(profile.SavePath + DateTime.Now.ToFileTime() + DateTime.Now.Millisecond + "_" + _exportFilename, localExportText);
+                    File.WriteAllText(profile.SavePath + DateTime.Now.ToFileTime() + "_" + _exportFilename, localExportText);
                 }
             }
 
@@ -150,6 +170,27 @@ namespace Mail_Agent_Service
                 // Move the email to the error folder
                 MoveItemToFolder(mailItem, _errorFolderName, _errorFolderId);
             }
+        }
+
+        private string GetToAddress(Item mailItem)
+        {
+            ExtendedPropertyDefinition propertyDefinition = new ExtendedPropertyDefinition(0x007D, MapiPropertyType.String);
+            PropertySet propertySet = new PropertySet(BasePropertySet.FirstClassProperties) { propertyDefinition, ItemSchema.MimeContent };
+
+            mailItem.Load(propertySet);
+            Object headerValues;
+            if (mailItem.TryGetProperty(propertyDefinition, out headerValues))
+            {
+                Regex regex = new Regex("To:.*<(.*)>");
+                Match match = regex.Match(headerValues.ToString());
+
+                if (match.Groups.Count == 2)
+                {
+                    return match.Groups[1].Value;
+                }
+            }
+
+            return null;
         }
 
         private string WriteEmailBodyForProfile(Item mailItem, Profile profile)
@@ -191,7 +232,7 @@ namespace Mail_Agent_Service
                 attachment.Load();
 
                 string name = attachment.Name.Replace(" ", "").ToLower();
-                name = "_" + DateTime.Now.ToFileTime() + DateTime.Now.Millisecond + name;
+                name = DateTime.Now.ToFileTime() + DateTime.Now.Millisecond + "_" + name;
 
                 // Save the attachment to the location defined in the settings
                 File.WriteAllBytes(profile.SavePath + name, attachment.Content);
