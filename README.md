@@ -1,4 +1,17 @@
-# CMU Mail Agent
+- [Install](#installation)
+- [Change Service User](#change-user-running-service)
+- [Uninstall](#uninstallation)
+- [Settings](#settings)
+  - [General](#general)
+  - [Log](#log)
+  - [Mail](#mail)
+  - [DefaultSavePath](#defaultsavepath)
+  - [Export](#export)
+  - [Profiles](#profiles)
+    - [Profile Settings (Overview)](#profile-settings)
+    - [Profile Keys](#profile-keys-overview)
+      - [Description](#profile-key-description)
+      - [Example](#example-keys)
 
 ## Installation
 
@@ -136,7 +149,7 @@ The profile keys are a list of the keys that you want to save in the Export file
         - `NULL`: Makes the field black (used for an empty placeholder)
     - `Search`: Looks inside the email body for the designated text inside of the element tag and gets the value after the tag and before the newline
 
-*Example:*
+## Example Keys
 
 Settings:
 
