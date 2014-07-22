@@ -1,3 +1,5 @@
+## Table of Contents
+
 - [Install](#installation)
 - [Change Service User](#change-user-running-service)
 - [Uninstall](#uninstallation)
