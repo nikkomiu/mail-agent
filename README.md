@@ -10,6 +10,8 @@ You can also run the installer from the command prompt **as administrator**, nav
 MailAgent.exe -install
 ```
 
+After the service is installed you should restart the system for the service to start and all the changes to take effect.
+
 ## Change User Running Service
 
 If you are going to specify a UNC path for the email content to be saved to, you will want/need to change the user that the service is running as to be a user that has write permission to the directory on the server.
