@@ -7,7 +7,7 @@ if (!$serviceName)
 
 if (!$exePath)
 {
-    $exePath = $MyInvocation.MyCommand.Definition.TrimEnd($MyInvocation.MyCommand.Name) + "cmuMailAgent.exe"
+    $exePath = $MyInvocation.MyCommand.Definition.TrimEnd($MyInvocation.MyCommand.Name) + "MailAgent.exe"
 }
 
 if (!$username -or !$password)
