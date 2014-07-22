@@ -109,7 +109,7 @@ namespace MailAgent.Service
 
                     // Output the probable cause to logs
                     _log.WriteLine(Logging.Level.CRITICAL, "Exchange Web Service Encountered an error!");
-                    _log.WriteLine(Logging.Level.CRITICAL, "  This could be caused by a login failure.");
+                    _log.WriteLine(Logging.Level.CRITICAL, "  This is probably caused by a login failure.");
                     _log.WriteLine(Logging.Level.CRITICAL, "  Check your connection information in the settings and restart the service.");
 
                     // Quit the service because this error cannot be recovered from
