@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace Mail_Agent_Service
+namespace MailAgent.Service
 {
     class FileMan
     {

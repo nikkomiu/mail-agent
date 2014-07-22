@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Mail_Agent_Service
+namespace MailAgent.Service
 {
     class ServiceThread
     {

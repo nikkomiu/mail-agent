@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ServiceProcess;
 
-namespace Mail_Agent_Service
+namespace MailAgent.Service
 {
     public partial class CMUMailAgent : ServiceBase
     {

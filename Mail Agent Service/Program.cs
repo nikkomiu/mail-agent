@@ -5,7 +5,7 @@ using System.ServiceProcess;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Mail_Agent_Service
+namespace MailAgent.Service
 {
     static class Program
     {

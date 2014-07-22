@@ -6,7 +6,7 @@ using System.Text;
 using Microsoft.Exchange.WebServices.Data;
 using System.Text.RegularExpressions;
 
-namespace Mail_Agent_Service
+namespace MailAgent.Service
 {
     public class ExchangeServer
     {

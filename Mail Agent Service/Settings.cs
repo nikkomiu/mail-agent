@@ -4,7 +4,7 @@ using System.Xml;
 using System.Text;
 using System.Collections.Generic;
 
-namespace Mail_Agent_Service
+namespace MailAgent.Service
 {
     class Settings
     {

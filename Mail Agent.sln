@@ -1,11 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30110.0
+VisualStudioVersion = 12.0.30501.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mail Agent", "Mail Agent\Mail Agent.csproj", "{3DBDB9F1-CAEA-4B4C-9A57-2858BC7842F2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mail Agent Service", "Mail Agent Service\Mail Agent Service.csproj", "{F168A1FC-F648-48B3-AEF8-D09BCAFFCDF4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MailAgent.Service", "Mail Agent Service\MailAgent.Service.csproj", "{F168A1FC-F648-48B3-AEF8-D09BCAFFCDF4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

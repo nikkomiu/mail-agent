@@ -1,4 +1,4 @@
-﻿namespace Mail_Agent_Service
+﻿namespace MailAgent.Service
 {
     partial class CMUMailAgent
     {
