@@ -57,8 +57,7 @@ namespace MailAgent.Domain
             this.WriteLine(Logging.Level.CRITICAL, "====================================================================");
             this.WriteLine(Logging.Level.CRITICAL, "There was an error that the program could not handle on its own:");
             this.WriteLine(Logging.Level.CRITICAL, ex.Message);
-            this.WriteLine(Logging.Level.CRITICAL, "with an error type:");
-            this.WriteLine(Logging.Level.CRITICAL, ex.GetType().ToString());
+            this.WriteLine(Logging.Level.CRITICAL, "with an error type: " + ex.GetType().ToString());
             this.WriteLine(Logging.Level.CRITICAL, "====================================================================");
         }
 
