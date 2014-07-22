@@ -140,6 +140,15 @@ namespace MailAgent.Service
                         // Log the error
                         log.WriteError(ex);
 
+                        if (ex.GetType() == new System.UnauthorizedAccessException().GetType())
+                        {
+                            log.WriteLine(Logging.Level.CRITICAL, "------------ Friendly Error ------------");
+                            log.WriteLine(Logging.Level.CRITICAL, "  The service is probably being ran as");
+                            log.WriteLine(Logging.Level.CRITICAL, "  the wrong user, make sure the user");
+                            log.WriteLine(Logging.Level.CRITICAL, "  can access the path provided");
+                            log.WriteLine(Logging.Level.CRITICAL, "----------------------------------------");
+                        }
+
                         // Move the email to the error folder
                         MoveItemToFolder(mailItem, _errorFolderName, _errorFolderId);
                     }
