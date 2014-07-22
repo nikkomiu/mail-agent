@@ -15,7 +15,7 @@
             <ColumnDefinition Width="4*"/>
         </Grid.ColumnDefinitions>
         <ListBox Margin="2,1,1.5,2.5" Grid.Row="2" Grid.RowSpan="2" Grid.ColumnSpan="2"/>
-        <Button Content="New Profile" Margin="2,2,0.5,1" Grid.Row="1" />
+        <Button x:Name="NewProfileButton" Content="New Profile" Margin="2,2,0.5,1" Grid.Row="1" Click="NewProfileButton_Click" />
         <Button Content="Remove" Margin="1.5,2,2.5,1" Grid.Row="1" Grid.Column="1"/>
         <Menu Width="Auto" Padding="1" Background="#FFA9D1F4" Margin="0" BorderThickness="0,0,0,1" BorderBrush="#FF6E9BC9" Grid.ColumnSpan="3">
             <MenuItem Header="_Emulator">

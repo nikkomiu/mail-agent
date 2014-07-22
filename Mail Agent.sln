@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.30501.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MailAgent.Client", "Mail Agent\MailAgent.Client.csproj", "{3DBDB9F1-CAEA-4B4C-9A57-2858BC7842F2}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MailAgent.Service", "Mail Agent Service\MailAgent.Service.csproj", "{F168A1FC-F648-48B3-AEF8-D09BCAFFCDF4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MailAgent.Domain", "MailAgent.Domain\MailAgent.Domain.csproj", "{EC828E6F-5EEC-40CA-A70C-A3A7DB1188AB}"
@@ -15,10 +13,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{3DBDB9F1-CAEA-4B4C-9A57-2858BC7842F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3DBDB9F1-CAEA-4B4C-9A57-2858BC7842F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3DBDB9F1-CAEA-4B4C-9A57-2858BC7842F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3DBDB9F1-CAEA-4B4C-9A57-2858BC7842F2}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F168A1FC-F648-48B3-AEF8-D09BCAFFCDF4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F168A1FC-F648-48B3-AEF8-D09BCAFFCDF4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F168A1FC-F648-48B3-AEF8-D09BCAFFCDF4}.Release|Any CPU.ActiveCfg = Release|Any CPU

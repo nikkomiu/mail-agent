@@ -24,5 +24,10 @@ namespace MailAgent.Client
         {
             InitializeComponent();
         }
+
+        private void NewProfileButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }
