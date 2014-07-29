@@ -19,11 +19,9 @@
 
 To compile this project you will need:
 
-Visual Studio 2010 or higher
-**- or -**
-NuGet Package Manager for Visual Studio
+- Visual Studio 2010 or higher **- or -** NuGet Package Manager for Visual Studio
 
-NuGet should automatically resolve package dependencies
+NuGet should automatically resolve package dependencies at compile time
 
 If NuGet does not automatically resolve package dependencies at compile time you will need to:
 
