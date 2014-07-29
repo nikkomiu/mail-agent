@@ -23,10 +23,10 @@ To compile this project you will need:
 
 NuGet should automatically resolve package dependencies at compile time
 
-If NuGet does not automatically resolve package dependencies at compile time you will need to:
-
-1. Open `Tools` -> `NuGet Package Manager` -> `Manage NuGet Packages for Solution...`
-2. Click the **Restore** button at the top of the window
+> If NuGet does not automatically resolve package dependencies at compile time you will need to:
+> 
+> 1. Open `Tools` -> `NuGet Package Manager` -> `Manage NuGet Packages for Solution...`
+> 2. Click the **Restore** button at the top of the window
 
 To build the solution for deployment:
 
