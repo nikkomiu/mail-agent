@@ -27,12 +27,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_3844307C58584521CFB74A93A687A105"
-        "OwnerKey" = "8:_8CA0260CCDA14C86AC624D464176772E"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_8CA0260CCDA14C86AC624D464176772E"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -40,7 +34,13 @@
         "Entry"
         {
         "MsmKey" = "8:_9485F6D9C899E1F74DBEE396B4422592"
-        "OwnerKey" = "8:_3844307C58584521CFB74A93A687A105"
+        "OwnerKey" = "8:_8CA0260CCDA14C86AC624D464176772E"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_9485F6D9C899E1F74DBEE396B4422592"
+        "OwnerKey" = "8:_E2D2A2EA16FAB4574C4B8219E6AF4A3B"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -51,7 +51,7 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_9485F6D9C899E1F74DBEE396B4422592"
+        "MsmKey" = "8:_E2D2A2EA16FAB4574C4B8219E6AF4A3B"
         "OwnerKey" = "8:_8CA0260CCDA14C86AC624D464176772E"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -70,31 +70,7 @@
         "Entry"
         {
         "MsmKey" = "8:_F91A04C14ED0C086BB2FEF902FB16CCD"
-        "OwnerKey" = "8:_3844307C58584521CFB74A93A687A105"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_F91A04C14ED0C086BB2FEF902FB16CCD"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_8CA0260CCDA14C86AC624D464176772E"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_ED9082F34BAF26CC4C7C894008831A2B"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_3844307C58584521CFB74A93A687A105"
+        "OwnerKey" = "8:_E2D2A2EA16FAB4574C4B8219E6AF4A3B"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -106,7 +82,31 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_ED9082F34BAF26CC4C7C894008831A2B"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_8CA0260CCDA14C86AC624D464176772E"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_E2D2A2EA16FAB4574C4B8219E6AF4A3B"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_11F3628A1D0CFA2667463986054814A2"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_F91A04C14ED0C086BB2FEF902FB16CCD"
         "MsmSig" = "8:_UNDEFINED"
         }
     }
@@ -127,6 +127,14 @@
         "PrivateKeyFile" = "8:"
         "TimeStampServer" = "8:"
         "InstallerBootstrapper" = "3:2"
+            "BootstrapperCfg:{63ACBE69-63AA-4F98-B2B6-99F9E24495F2}"
+            {
+            "Enabled" = "11:TRUE"
+            "PromptEnabled" = "11:TRUE"
+            "PrerequisitesLocation" = "2:1"
+            "Url" = "8:"
+            "ComponentsUrl" = "8:"
+            }
         }
         "Release"
         {
@@ -134,7 +142,7 @@
         "IsDebugOnly" = "11:FALSE"
         "IsReleaseOnly" = "11:TRUE"
         "OutputFilename" = "8:Release\\Setup.msi"
-        "PackageFilesAs" = "3:1"
+        "PackageFilesAs" = "3:2"
         "PackageFileSize" = "3:-2147483648"
         "CabType" = "3:1"
         "Compression" = "3:2"
@@ -143,6 +151,14 @@
         "PrivateKeyFile" = "8:"
         "TimeStampServer" = "8:"
         "InstallerBootstrapper" = "3:2"
+            "BootstrapperCfg:{63ACBE69-63AA-4F98-B2B6-99F9E24495F2}"
+            {
+            "Enabled" = "11:TRUE"
+            "PromptEnabled" = "11:TRUE"
+            "PrerequisitesLocation" = "2:1"
+            "Url" = "8:"
+            "ComponentsUrl" = "8:"
+            }
         }
     }
     "Deployable"
@@ -251,20 +267,20 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_3844307C58584521CFB74A93A687A105"
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_9485F6D9C899E1F74DBEE396B4422592"
             {
             "AssemblyRegister" = "3:1"
-            "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Microsoft.Exchange.WebServices.Auth, Version=15.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL"
+            "AssemblyIsInGAC" = "11:TRUE"
+            "AssemblyAsmDisplayName" = "8:Microsoft.IdentityModel, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_3844307C58584521CFB74A93A687A105"
+                    "_9485F6D9C899E1F74DBEE396B4422592"
                     {
-                    "Name" = "8:Microsoft.Exchange.WebServices.Auth.dll"
+                    "Name" = "8:Microsoft.IdentityModel.dll"
                     "Attributes" = "3:512"
                     }
                 }
-            "SourcePath" = "8:Microsoft.Exchange.WebServices.Auth.dll"
+            "SourcePath" = "8:Microsoft.IdentityModel.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_A4A4D3A8F6BE4324B2BF7C4847592292"
@@ -282,20 +298,20 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_9485F6D9C899E1F74DBEE396B4422592"
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_E2D2A2EA16FAB4574C4B8219E6AF4A3B"
             {
             "AssemblyRegister" = "3:1"
-            "AssemblyIsInGAC" = "11:TRUE"
-            "AssemblyAsmDisplayName" = "8:Microsoft.IdentityModel, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:Microsoft.Exchange.WebServices.Auth, Version=15.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_9485F6D9C899E1F74DBEE396B4422592"
+                    "_E2D2A2EA16FAB4574C4B8219E6AF4A3B"
                     {
-                    "Name" = "8:Microsoft.IdentityModel.dll"
+                    "Name" = "8:Microsoft.Exchange.WebServices.Auth.dll"
                     "Attributes" = "3:512"
                     }
                 }
-            "SourcePath" = "8:Microsoft.IdentityModel.dll"
+            "SourcePath" = "8:Microsoft.Exchange.WebServices.Auth.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_A4A4D3A8F6BE4324B2BF7C4847592292"
