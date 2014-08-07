@@ -42,6 +42,9 @@ To build the installer:
 1. Change the solution configuration from `Debug` to `Release`
 2. Right Click on the `MailAgent.Setup` Project
 3. Click `Rebuild`
+4. The compiled program should be located at `%project_root%\MailAgent.Setup\bin\Release\` directory
+5. Run the installation on the deployment system and follow the installation instructions.
+6. Start the Mail Agent service in Services or **restart the deployment system** to start Mail Agent
 
 ## Installation
 
