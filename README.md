@@ -20,6 +20,7 @@
 To compile this project you will need:
 
 - Visual Studio 2010 or higher **- or -** NuGet Package Manager for Visual Studio
+- [Microsoft Visual Studio Installer Projects](http://visualstudiogallery.msdn.microsoft.com/9abe329c-9bba-44a1-be59-0fbf6151054d)
 
 NuGet should automatically resolve package dependencies at compile time
 
@@ -35,6 +36,12 @@ To build the solution for deployment:
 3. Open `Build` -> `Build Solution`
 4. The compiled program should be located at `%project_root%\MailAgent.Service\bin\Release\` directory
 5. Move the program to the deployment system and follow the [installation](#installation) instructions.
+
+To build the installer:
+
+1. Change the solution configuration from `Debug` to `Release`
+2. Right Click on the `MailAgent.Setup` Project
+3. Click `Rebuild`
 
 ## Installation
 
