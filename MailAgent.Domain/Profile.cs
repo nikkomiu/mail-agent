@@ -147,5 +147,10 @@ namespace MailAgent.Domain
 
             return profile;
         }
+
+        public override string ToString()
+        {
+            return this.Name;
+        }
     }
 }

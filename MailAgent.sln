@@ -12,6 +12,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MailAgent.Domain", "MailAge
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "MailAgent.Setup", "MailAgent.Setup\MailAgent.Setup.vdproj", "{867627F2-3427-402E-910B-81CB9093E3F3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MailAgent.Manager", "MailAgent.Manager\MailAgent.Manager.csproj", "{65841324-6DBC-45B6-B28D-C5E1E62F8903}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -28,6 +30,10 @@ Global
 		{EC828E6F-5EEC-40CA-A70C-A3A7DB1188AB}.Release|Any CPU.Build.0 = Release|Any CPU
 		{867627F2-3427-402E-910B-81CB9093E3F3}.Debug|Any CPU.ActiveCfg = Debug
 		{867627F2-3427-402E-910B-81CB9093E3F3}.Release|Any CPU.ActiveCfg = Release
+		{65841324-6DBC-45B6-B28D-C5E1E62F8903}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{65841324-6DBC-45B6-B28D-C5E1E62F8903}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{65841324-6DBC-45B6-B28D-C5E1E62F8903}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{65841324-6DBC-45B6-B28D-C5E1E62F8903}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
