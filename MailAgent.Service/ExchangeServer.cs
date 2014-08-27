@@ -99,7 +99,7 @@ namespace MailAgent.Service
                         {
                             string toAddress = GetToAddress(mailItem);
 
-                            if (toAddress == null || !profile.Alias.Contains(toAddress))
+                            if (toAddress != null && !profile.Alias.Contains(toAddress))
                             {
                                 continue;
                             }
