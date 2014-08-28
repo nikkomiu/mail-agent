@@ -42,6 +42,9 @@ To build the installer:
 1. Change the solution configuration from `Debug` to `Release`
 2. Right Click on the `MailAgent.Setup` Project
 3. Click `Rebuild`
+4. The compiled program should be located at `%project_root%\MailAgent.Setup\bin\Release\` directory
+5. Run the installation on the deployment system and follow the installation instructions.
+6. Start the Mail Agent service in Services or **restart the deployment system** to start Mail Agent
 
 ## Installation
 
@@ -145,6 +148,8 @@ The profiles are where the individual actions take place based on email data. Th
 #### Profile Settings
 
 - `Name`: (Unique String) The name of the profile
+- `Alias`: (String) Add an email alias to the INMA account in Exchange and set this value accordingly if you would like all messages sent to the email alias (must be in the `To` field) to be handled by this profile
+    - **Note:** The INMA account must hidden from the Global Address List in Exchange for this to work!
 - `EmailSubject`: (String) The subject substring to match for the profile
     - **Recommendation:** Use a SHA1 value of the Name string to make sure that the emails have a unique value
       In Terminal: echo -n "Profile Name" | openssl sha1
