@@ -125,22 +125,28 @@ namespace MailAgent.Service
                         {
                             continue;
                         }
-                        
+
+                        int totalItemsDropped = 0;
+
                         // Save the body if the profile wants it saved
                         if (profile.SaveEmailBody)
                         {
                             localExportText += WriteEmailBodyForProfile(mailItem, profile);
+                            totalItemsDropped += 1;
                         }
 
                         // Save the attachments if the profile wants them saved
                         if (mailItem.HasAttachments && profile.SaveAttachments)
                         {
                             localExportText += WriteAttachmentsForProfile(mailItem, profile);
+                            totalItemsDropped += mailItem.Attachments.Count;
                         }
 
                         // Move the email to the success folder
                         MoveItemToFolder(mailItem, _successFolderName, _successFolderId);
-                        log.WriteLine(Logging.Level.INFO, "Moved " + mailItem.Subject + " to " + _successFolderName + " folder");
+                        
+                        log.WriteLine(Logging.Level.INFO, totalItemsDropped + " attachment(s) dropped into folder");
+                        log.WriteLine(Logging.Level.INFO, "Moved `" + mailItem.Subject + "` to " + _successFolderName + " folder using `" + profile.Name + "` profile");
                     }
                     catch (Exception ex)
                     {
