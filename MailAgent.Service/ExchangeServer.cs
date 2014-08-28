@@ -24,6 +24,8 @@ namespace MailAgent.Service
 
         private Logging _logger;
 
+        private string _emailAddress;
+
         public ExchangeServer(Dictionary<string, string> settings, Logging logger) : this(settings)
         {
             this._logger = logger;
@@ -49,6 +51,7 @@ namespace MailAgent.Service
                 _exService.Credentials = new NetworkCredential(settings["MailEmail"], settings["MailPassword"]);
             }
 
+            _emailAddress = settings["MailEmail"];
 
             // If URL is Auto
             if (settings["MailUrl"].ToUpper() == "AUTO")
@@ -95,19 +98,23 @@ namespace MailAgent.Service
                         
                         // If the profile has an alias set and the email is not to the alias address
                         // skip the current email
-                        if (profile.Alias != null && profile.Alias.Length > 0)
-                        {
-                            string toAddress = GetToAddress(mailItem);
+                        string toAddress = GetToAddress(mailItem);
 
+                        if (!string.IsNullOrEmpty(profile.Alias))
+                        {
                             if (toAddress != null && !profile.Alias.Contains(toAddress))
                             {
                                 continue;
                             }
                         }
+                        else if (string.IsNullOrEmpty(toAddress) || !toAddress.Contains(_emailAddress))
+                        {
+                            continue;
+                        }
 
                         // If the profile has an email subject to match then check the email subject for the string
                         // and if the email subject does not contain the profile subject skip the current email
-                        if (profile.EmailSubject.Length > 0 && !mailItem.Subject.Contains(profile.EmailSubject))
+                        if (!string.IsNullOrEmpty(profile.EmailSubject) && !mailItem.Subject.Contains(profile.EmailSubject))
                         {
                             continue;
                         }
