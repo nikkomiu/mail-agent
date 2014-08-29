@@ -4,6 +4,7 @@ using Microsoft.Exchange.WebServices.Data;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -129,11 +130,11 @@ namespace MailAgent.Service
 
                 // If the profile has an alias set and the email is not to the alias address
                 // skip the current email
-                string toAddress = GetToAddress(item);
-
                 if (!string.IsNullOrEmpty(profile.Alias))
                 {
-                    if (toAddress != null && !profile.Alias.Contains(toAddress))
+                    List<string> toAddress = GetToAddress(item);
+
+                    if (toAddress != null && toAddress.Where(x => profile.Alias.Contains(x)).Count() == 0)
                     {
                         _logger.WriteLine(Logging.Level.INFO, "Profile " + profile.Name + " does not have an alias for the email: " + item.Subject);
                         return string.Empty;
@@ -196,8 +197,10 @@ namespace MailAgent.Service
             return localExportText;
         }
 
-        private string GetToAddress(Item mailItem)
+        private List<string> GetToAddress(Item mailItem)
         {
+            List<string> returnResults = new List<string>();
+
             ExtendedPropertyDefinition propertyDefinition = new ExtendedPropertyDefinition(0x007D, MapiPropertyType.String);
             PropertySet propertySet = new PropertySet(BasePropertySet.FirstClassProperties) { propertyDefinition, ItemSchema.MimeContent };
 
@@ -206,15 +209,23 @@ namespace MailAgent.Service
             if (mailItem.TryGetProperty(propertyDefinition, out headerValues))
             {
                 Regex regex = new Regex("To:.*<(.*)>");
+                Regex regex2 = new Regex("CC:.*<(.*)>");
+
                 Match match = regex.Match(headerValues.ToString());
+                Match match2 = regex2.Match(headerValues.ToString());
 
                 if (match.Groups.Count == 2)
                 {
-                    return match.Groups[1].Value;
+                    returnResults.Add(match.Groups[1].Value);
+                }
+
+                if (match2.Groups.Count == 2)
+                {
+                    returnResults.Add(match2.Groups[1].Value);
                 }
             }
 
-            return null;
+            return returnResults;
         }
 
         private string WriteEmailBodyForProfile(Item mailItem, Profile profile)
@@ -282,7 +293,9 @@ namespace MailAgent.Service
         {
             // If the folder id is null get the folder id by the folder name
             if (folderId == null)
+            {
                 folderId = FindOrCreateFolderByName(folderName);
+            }
 
             // Move the message to the folder
             mailItem.Move(folderId);
