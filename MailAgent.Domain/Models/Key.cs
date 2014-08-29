@@ -1,26 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Xml.Serialization;
 
-namespace MailAgent.Domain
+namespace MailAgent.Domain.Models
 {
     public class Key
     {
         public string Name { get; set; }
-        public string Value { get; set; }
-        public string Type { get; set; }
 
-        private int _increment;
+        public string Type { get; set; }
         
-        public Key(string name = "", string value = "", string type = "")
-        {
-            _increment = 1;
-            this.Name = name;
-            this.Value = value;
-            this.Type = type;
-        }
+        public string Value { get; set; }
 
         public string ToDynamicString(string delimiter, string dynamicSearch = "")
         {
@@ -47,8 +36,7 @@ namespace MailAgent.Domain
 
                 if (this.Value == "INCREMENT")
                 {
-                    returnString += _increment;
-                    _increment++;
+                    returnString += Guid.NewGuid().ToString().Replace("-", "");
                 }
             }
             else if (this.Type == "Search" && dynamicSearch.Length > 0)

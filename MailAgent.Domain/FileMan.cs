@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Xml.Serialization;
 
 namespace MailAgent.Domain
 {
@@ -37,7 +38,9 @@ namespace MailAgent.Domain
                 string directory = this.FilePath.Substring(0, this.FilePath.LastIndexOf('\\'));
 
                 if (!Directory.Exists(directory))
+                {
                     Directory.CreateDirectory(directory);
+                }
 
                 this._fileContents = File.ReadAllText(this.FilePath);
             }
@@ -71,7 +74,43 @@ namespace MailAgent.Domain
 
         public void Append(string appendString)
         {
+            string directory = this.FilePath.Substring(0, this.FilePath.LastIndexOf('\\'));
+
+            if (!Directory.Exists(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+
             File.AppendAllText(this.FilePath, appendString);
+        }
+
+        public void Delete()
+        {
+            File.Delete(this.FilePath);
+        }
+
+        public void Serialize<T>(T objectToSerialize)
+        {
+            XmlSerializer serializer = new XmlSerializer(typeof(T));
+
+            using (StreamWriter writer = new StreamWriter(this.FilePath))
+            {
+                serializer.Serialize(writer, objectToSerialize);
+            }
+        }
+
+        public T Deserialize<T>()
+        {
+            XmlSerializer serializer = new XmlSerializer(typeof(T));
+
+            T output;
+
+            using (StreamReader stream = new StreamReader(this.FilePath))
+            {
+                output = (T)serializer.Deserialize(stream);
+            }
+
+            return output;
         }
 
         public static FileMan LocalFile(string filePath)

@@ -1,10 +1,11 @@
 ﻿using MailAgent.Domain;
+using MailAgent.Domain.Models;
+using Microsoft.Exchange.WebServices.Data;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
-using Microsoft.Exchange.WebServices.Data;
 using System.Text.RegularExpressions;
 
 namespace MailAgent.Service
@@ -26,18 +27,20 @@ namespace MailAgent.Service
 
         private string _emailAddress;
 
-        public ExchangeServer(Dictionary<string, string> settings, Logging logger) : this(settings)
+        public ExchangeServer(General settings, Logging _loggerger) : this(settings)
         {
-            this._logger = logger;
+            this._logger = _loggerger;
         }
 
-        public ExchangeServer(Dictionary<string, string> settings)
+        public ExchangeServer(General settings)
         {
             // Set the version of Exchange from settings file
-            this._exService = new ExchangeService(GetVersionFromString(settings["MailExchangeVersion"]));
+            this._exService = new ExchangeService(GetVersionFromString(settings.Mail.ExchangeVersion));
+
+            _emailAddress = settings.Mail.Email;
 
             // If not using windows credentials (from settings file) use manually define credentials
-            if (settings["MailUseWindowsCredentials"].ToUpper() == "TRUE")
+            if (settings.Mail.UseWindowsCredentials.ToUpper() == "TRUE")
             {
                 // Use Windows Credentials
                 _exService.UseDefaultCredentials = true;
@@ -47,32 +50,30 @@ namespace MailAgent.Service
                 // Do not use Windows Credentials
                 _exService.UseDefaultCredentials = false;
 
-                // Set the login credentials
-                _exService.Credentials = new NetworkCredential(settings["MailEmail"], settings["MailPassword"]);
+                // Set the _loggerin credentials
+                _exService.Credentials = new NetworkCredential(_emailAddress, settings.Mail.Password);
             }
 
-            _emailAddress = settings["MailEmail"];
-
             // If URL is Auto
-            if (settings["MailUrl"].ToUpper() == "AUTO")
+            if (settings.Mail.Url.ToUpper() == "AUTO")
             {
                 // Autodiscover based on email address
-                _exService.AutodiscoverUrl(settings["MailEmail"]);
+                _exService.AutodiscoverUrl(_emailAddress);
             }
             else
             {
                 // Set the URL manually
-                _exService.Url = new Uri(settings["MailUrl"]);
+                _exService.Url = new Uri(settings.Mail.Url);
             }
 
             // Set the error folder name from the settings
-            _errorFolderName = settings["MailErrorFolder"];
-            _successFolderName = settings["MailSuccessFolder"];
-            _exportFilename = settings["ExportFilename"];
-            _globalSavePath = settings["DefaultSavePath"];
+            _errorFolderName = settings.Mail.ErrorFolder;
+            _successFolderName = settings.Mail.SuccessFolder;
+            _exportFilename = settings.Export.Filename;
+            _globalSavePath = settings.DefaultSavePath;
         }
 
-        public void SaveMail(List<Profile> Profiles, Logging log)
+        public void SaveMail(Profile[] profiles)
         {
             // Get all of the mailbox items
             FindItemsResults<Item> inboxItems = _exService.FindItems(WellKnownFolderName.Inbox, new ItemView(100));
@@ -80,119 +81,119 @@ namespace MailAgent.Service
             // List of mailbox items that have been processed
             List<Item> completeInboxItems = new List<Item>();
 
-            foreach (Profile profile in Profiles)
+            foreach (Item item in inboxItems)
             {
-                // Create a new temporary string for writing the output
-                string localExportText = string.Empty;
+                SetSomeCrap(item, profiles);
+            }
+        }
 
-                // Loop through all of the mail items that are in the inbox
-                foreach (Item mailItem in inboxItems)
+        private void SetSomeCrap(Item item, Profile[] profiles)
+        {
+            string localExportText = string.Empty;
+
+            bool foundResult = false;
+
+            foreach (Profile profile in profiles)
+            {
+                localExportText = ProfileCrap(item, profile);
+
+                if (!string.IsNullOrEmpty(localExportText))
                 {
-                    try
-                    {
-                        // Log the subject of the email being processed
-                        log.WriteLine(Logging.Level.DEBUG, "Current Item (Subject): " + mailItem.Subject);
+                    foundResult = true;
 
-                        // Load the item to get the body + attachments
-                        mailItem.Load();
-                        
-                        // If the profile has an alias set and the email is not to the alias address
-                        // skip the current email
-                        string toAddress = GetToAddress(mailItem);
-
-                        if (!string.IsNullOrEmpty(profile.Alias))
-                        {
-                            if (toAddress != null && !profile.Alias.Contains(toAddress))
-                            {
-                                continue;
-                            }
-                        }
-                        else if (string.IsNullOrEmpty(toAddress) || !toAddress.Contains(_emailAddress))
-                        {
-                            continue;
-                        }
-
-                        // If the profile has an email subject to match then check the email subject for the string
-                        // and if the email subject does not contain the profile subject skip the current email
-                        if (!string.IsNullOrEmpty(profile.EmailSubject) && !mailItem.Subject.Contains(profile.EmailSubject))
-                        {
-                            continue;
-                        }
-
-                        // If the profile has an email body to match then check the email body for the string
-                        // and if the email body does not contain the profile body skip the current email
-                        if (profile.EmailBody.Length > 0 && !mailItem.Body.Text.Contains(profile.EmailBody))
-                        {
-                            continue;
-                        }
-
-                        int totalItemsDropped = 0;
-
-                        // Save the body if the profile wants it saved
-                        if (profile.SaveEmailBody)
-                        {
-                            localExportText += WriteEmailBodyForProfile(mailItem, profile);
-                            totalItemsDropped += 1;
-                        }
-
-                        // Save the attachments if the profile wants them saved
-                        if (mailItem.HasAttachments && profile.SaveAttachments)
-                        {
-                            localExportText += WriteAttachmentsForProfile(mailItem, profile);
-                            totalItemsDropped += mailItem.Attachments.Count;
-                        }
-
-                        // Move the email to the success folder
-                        MoveItemToFolder(mailItem, _successFolderName, _successFolderId);
-                        
-                        log.WriteLine(Logging.Level.INFO, totalItemsDropped + " attachment(s) dropped into folder");
-                        log.WriteLine(Logging.Level.INFO, "Moved `" + mailItem.Subject + "` to " + _successFolderName + " folder using `" + profile.Name + "` profile");
-                    }
-                    catch (Exception ex)
-                    {
-                        // Log the error
-                        log.WriteError(ex);
-
-                        if (ex.GetType() == new System.UnauthorizedAccessException().GetType())
-                        {
-                            log.WriteLine(Logging.Level.CRITICAL, "------------ Friendly Error ------------");
-                            log.WriteLine(Logging.Level.CRITICAL, "  The service is probably being ran as");
-                            log.WriteLine(Logging.Level.CRITICAL, "  the wrong user, make sure the user");
-                            log.WriteLine(Logging.Level.CRITICAL, "  can access the path provided");
-                            log.WriteLine(Logging.Level.CRITICAL, "----------------------------------------");
-                        }
-
-                        // Move the email to the error folder
-                        MoveItemToFolder(mailItem, _errorFolderName, _errorFolderId);
-                    }
-
-                    // Add the item to the complete list
-                    completeInboxItems.Add(mailItem);
-
-                    // Sleep so there is time between emails
-                    System.Threading.Thread.Sleep(5);
-                }
-
-                // Write the export file if there were emails processed and completed
-                if (completeInboxItems.Count > 0 && localExportText.Length > 0)
-                {
                     // Write the export file to the profile's save path
                     File.WriteAllText(profile.SavePath + DateTime.Now.ToFileTime() + "_" + _exportFilename, localExportText);
+
+                    break;
                 }
             }
 
-            // Move the items still in the inbox to the error folder
-            foreach (Item mailItem in inboxItems)
+            if (!foundResult)
             {
-                // If the item has already been processed skip it
-                if (completeInboxItems.Contains(mailItem))
+                // Move the email to the error folder
+                MoveItemToFolder(item, _errorFolderName, _errorFolderId);
+            }
+        }
+
+        private string ProfileCrap(Item item, Profile profile)
+        {
+            string localExportText = string.Empty;
+
+            try
+            {
+                // Log the subject of the email being processed
+                _logger.WriteLine(Logging.Level.DEBUG, "Current Item (Subject): " + item.Subject);
+
+                // Load the item to get the body + attachments
+                item.Load();
+
+                // If the profile has an alias set and the email is not to the alias address
+                // skip the current email
+                string toAddress = GetToAddress(item);
+
+                if (!string.IsNullOrEmpty(profile.Alias))
                 {
-                    continue;
+                    if (toAddress != null && !profile.Alias.Contains(toAddress))
+                    {
+                        _logger.WriteLine(Logging.Level.INFO, "Profile " + profile.Name + " does not have an alias for the email: " + item.Subject);
+                        return string.Empty;
+                    }
                 }
 
-                // Move the email to the error folder
-                MoveItemToFolder(mailItem, _errorFolderName, _errorFolderId);
+                // If the profile has an email subject to match then check the email subject for the string
+                // and if the email subject does not contain the profile subject skip the current email
+                if (!string.IsNullOrEmpty(profile.EmailSubject) && !item.Subject.Contains(profile.EmailSubject))
+                {
+                    _logger.WriteLine(Logging.Level.INFO, "Profile " + profile.Name + " does not match the subject line for the email: " + item.Subject);
+                    return string.Empty;
+                }
+
+                // If the profile has an email body to match then check the email body for the string
+                // and if the email body does not contain the profile body skip the current email
+                if (profile.EmailBody.Length > 0 && !item.Body.Text.Contains(profile.EmailBody))
+                {
+                    _logger.WriteLine(Logging.Level.INFO, "Profile " + profile.Name + " does not match the body string for the email: " + item.Subject);
+                    return string.Empty;
+                }
+
+                int totalItemsDropped = 0;
+
+                // Save the body if the profile wants it saved
+                if (profile.SaveEmailBody)
+                {
+                    localExportText += WriteEmailBodyForProfile(item, profile);
+                    totalItemsDropped += 1;
+                }
+
+                // Save the attachments if the profile wants them saved
+                if (item.HasAttachments && profile.SaveAttachments)
+                {
+                    localExportText += WriteAttachmentsForProfile(item, profile);
+                    totalItemsDropped += item.Attachments.Count;
+                }
+
+                // Move the email to the success folder
+                MoveItemToFolder(item, _successFolderName, _successFolderId);
+
+                _logger.WriteLine(Logging.Level.INFO, totalItemsDropped + " attachment(s) dropped into folder");
+                _logger.WriteLine(Logging.Level.INFO, "Moved `" + item.Subject + "` to " + _successFolderName + " folder using `" + profile.Name + "` profile");
             }
+            catch (Exception ex)
+            {
+                // Log the error
+                _logger.WriteError(ex);
+
+                if (ex.GetType() == new System.UnauthorizedAccessException().GetType())
+                {
+                    _logger.WriteLine(Logging.Level.CRITICAL, "------------ Friendly Error ------------");
+                    _logger.WriteLine(Logging.Level.CRITICAL, "  The service is probably being ran as");
+                    _logger.WriteLine(Logging.Level.CRITICAL, "  the wrong user, make sure the user");
+                    _logger.WriteLine(Logging.Level.CRITICAL, "  can access the path provided");
+                    _logger.WriteLine(Logging.Level.CRITICAL, "----------------------------------------");
+                }
+            }
+
+            return localExportText;
         }
 
         private string GetToAddress(Item mailItem)
@@ -230,7 +231,7 @@ namespace MailAgent.Service
             
             foreach (Key k in profile.Keys)
             {
-                builder.Append(k.ToDynamicString(profile.Delimiter, mailItem.Body));
+                builder.Append(k.ToDynamicString(profile.KeyDelimiter, mailItem.Body));
             }
 
             // Append the file name to exporting string
@@ -264,7 +265,7 @@ namespace MailAgent.Service
                 foreach (Key k in profile.Keys)
                 {
                     // Append the key value
-                    builder.Append(k.ToDynamicString(profile.Delimiter, mailItem.Body));
+                    builder.Append(k.ToDynamicString(profile.KeyDelimiter, mailItem.Body));
                 }
 
                 // Append the filename of the attachment

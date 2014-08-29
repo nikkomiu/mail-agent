@@ -1,5 +1,7 @@
 ﻿using MailAgent.Domain;
+using MailAgent.Domain.Models;
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -34,6 +36,8 @@ namespace MailAgent.Service
 
         public void Stop()
         {
+            FileMan.LocalFile("_settings.active.xml").Delete();
+
             // Create and start new thread to kill process thread
             new Thread(() =>
             {
@@ -61,39 +65,20 @@ namespace MailAgent.Service
 #endif
             this.ThreadSetup();
 
-            // Convert MailPolling variable into an int
-            int threadSleep;
-            int.TryParse(_settings.General["MailPolling"], out threadSleep);
-
             // Loop "forever"
             while (true)
             {
-                // Convert LogLocalLocation setting from string to bool
-                bool localLocation;
-                bool.TryParse(_settings.General["LogLocalLocation"], out localLocation);
-
-                // Convert LogLevel from string to enum
-                Logging.Level logLevel;
-                Enum.TryParse(_settings.General["LogLevel"], true, out logLevel);
-
-                // Setup the logging file
-                _log = new Logging(_settings.General["LogLocation"], logLevel, localLocation);
-
                 _log.WriteLine(Logging.Level.DEBUG, "Reached Start of Thread Loop");
 
                 try
                 {
                     // Create a new ExchangeServer
-#if DEBUG
                     ExchangeServer exchange = new ExchangeServer(_settings.General, _log);
-#else
-                    ExchangeServer exchange = new ExchangeServer(_settings.General);
-#endif
 
                     // Save mail in Exchange
-                    exchange.SaveMail(_settings.Profiles, _log);
+                    exchange.SaveMail(_settings.Profiles);
                 }
-
+                
                 // Catch exception for thread abort (OnStop)
                 catch (ThreadAbortException)
                 {
@@ -132,7 +117,7 @@ namespace MailAgent.Service
                 lock (_lockObject)
                 {
                     // Sleep for the set time in the settings
-                    Monitor.Wait(_lockObject, new TimeSpan(0, 0, 0, threadSleep));
+                    Monitor.Wait(_lockObject, new TimeSpan(0, 0, 0, _settings.General.Mail.Polling));
 
                     // If there was a request to cancel the thread
                     if (_cancelToken.Token.IsCancellationRequested)
@@ -143,25 +128,41 @@ namespace MailAgent.Service
                 }
 
                 _log.WriteLine(Logging.Level.DEBUG, "Reached End of Thread Loop");
+
+                // Recreate the Logging File
+                _log = new Logging(_settings.General.Log);
             }
         }
 
         private void ThreadSetup()
         {
             // Parse the settings file
-            this._settings = new Settings();
-            _settings.Parse();
+            FileMan fileManager = FileMan.LocalFile("Settings.xml");
+            _settings = fileManager.Deserialize<Settings>();
 
-            // Convert LogLocalLocation setting from string to bool
-            bool localLocation;
-            bool.TryParse(_settings.General["LogLocalLocation"], out localLocation);
+            // Set defaults for profiles
+            foreach (Profile profile in _settings.Profiles.Where(x => x.ID == null || x.ID == Guid.Empty))
+            {
+                profile.ID = Guid.NewGuid();
+            }
 
-            // Convert LogLevel from string to enum
-            Logging.Level logLevel;
-            Enum.TryParse(_settings.General["LogLevel"], true, out logLevel);
+            foreach (Profile profile in _settings.Profiles.Where(x => x.KeyDelimiter == null || (x.IsDefaultKeyDelimiter == true && x.KeyDelimiter != _settings.General.Export.KeyDelimiter)))
+            {
+                profile.KeyDelimiter = _settings.General.Export.KeyDelimiter;
+                profile.IsDefaultKeyDelimiter = true;
+            }
+
+            foreach (Profile profile in _settings.Profiles.Where(x => x.SavePath == null || (x.IsDefaultSavePath == true && x.SavePath != _settings.General.DefaultSavePath)))
+            {
+                profile.SavePath = _settings.General.DefaultSavePath;
+                profile.IsDefaultSavePath = true;
+            }
+
+            fileManager = FileMan.LocalFile("_settings.active.xml");
+            fileManager.Serialize<Settings>(_settings);
 
             // Setup the logging file
-            _log = new Logging(_settings.General["LogLocation"], logLevel, localLocation);
+            _log = new Logging(_settings.General.Log);
 
             // Log the start of the thread with some settings information
             _log.Begin(_settings.General);

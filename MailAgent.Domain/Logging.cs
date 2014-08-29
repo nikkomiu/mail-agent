@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MailAgent.Domain.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,28 +15,36 @@ namespace MailAgent.Domain
         private FileMan _fileManager;
         private Level _logLevel;
 
-        public Logging() : this("debug.log", Level.DEBUG)
+        public Logging()
+            : this(new Log { Location = "debug.log", Level = Level.DEBUG, LocalLocation = true })
         {
         }
 
-        public Logging(string logName, Level logLevel, bool isLocalFile = true)
+        public Logging(Log log)
         {
             // Set the log level to output
-            this._logLevel = logLevel;
+            this._logLevel = log.Level;
 
             // Add datestamp to filename
-            string[] splitLogName = logName.Split('.');
+            string outputLocaiton = string.Empty;
+
+            string[] splitLogName = log.Location.Split('.');
             splitLogName[splitLogName.Length - 2] += "_" + CurrentDate(DateTime.Now) + ".";
-            logName = string.Empty;
 
             foreach (string stringPart in splitLogName)
-                logName += stringPart;
+            {
+                outputLocaiton += stringPart;
+            }
 
             // If it is a local file use a local path otherwise use an absolute path
-            if (isLocalFile)
-                _fileManager = FileMan.LocalFile("logs\\" + logName);
+            if (log.LocalLocation)
+            {
+                _fileManager = FileMan.LocalFile("log\\" + outputLocaiton);
+            }
             else
-                _fileManager = new FileMan(logName);
+            {
+                _fileManager = new FileMan(log.Location);
+            }
         }
 
         public void Write(Level logLevel, string logText)
@@ -66,15 +75,15 @@ namespace MailAgent.Domain
             return (_logLevel >= outputLevel) ? true : false;
         }
 
-        public void Begin(Dictionary<string, string> settings)
+        public void Begin(General generalSettings)
         {
             this.WriteLine(Level.INFO, "-----------------------------------------------------------");
             this.WriteLine(Level.INFO, "Process has started @ " + DateTime.Now.ToString());
 
             // Output Settings Information
-            this.WriteLine(Logging.Level.DEBUG, "Log Location:          " + settings["LogLocation"]);
-            this.WriteLine(Logging.Level.DEBUG, "Log Level:             " + settings["LogLevel"]);
-            this.WriteLine(Logging.Level.DEBUG, "Mail Polling Interval: " + settings["MailPolling"]);
+            this.WriteLine(Logging.Level.DEBUG, "Log Location:          " + generalSettings.Log.Location);
+            this.WriteLine(Logging.Level.DEBUG, "Log Level:             " + generalSettings.Log.Level);
+            this.WriteLine(Logging.Level.DEBUG, "Mail Polling Interval: " + generalSettings.Mail.Polling);
 
             this.WriteLine(Level.INFO, "-----------------------------------------------------------");
         }
