@@ -1,6 +1,7 @@
 ﻿using MailAgent.Domain;
 using MailAgent.Domain.Models;
 using Microsoft.Exchange.WebServices.Data;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -261,11 +262,58 @@ namespace MailAgent.Service
                 // Save the attachment to the location defined in the settings
                 File.WriteAllBytes(profile.SavePath + name, attachment.Content);
                 
+                // Get Body JSON Data
+                Match match = Regex.Match(mailItem.Body, "<script .*type=?(\"|')application/json?(\"|').*?>.*?({.*}).*?</script>", RegexOptions.Singleline);
+
+                // Log the results of the JSON Match
+                foreach (Group x in match.Groups)
+                {
+                    _logger.WriteLine(Logging.Level.DEBUG, "REGEX Matching Group: " + x.Value);
+                }
+
+                // Parse Body JSON Data
+                JSONKeys keyOverrideList = GetJSONKeys(match.Groups[match.Groups.Count].Value);
+
                 // Foreach of the profile keys append the values to the export file
                 foreach (Key k in profile.Keys)
                 {
+                    string keyValue = string.Empty;
+                    Key newKey = null;
+
+                    // If the key override exists
+                    if (keyOverrideList != null)
+                    {
+                        // Get the override key that has the same name if it exists
+                        newKey = keyOverrideList.KeyOverrides.Where(x => x.Name == k.Name).SingleOrDefault();
+                    }
+
+                    // If there is an override key
+                    if (newKey != null)
+                    {
+                        // If the override key type is null
+                        if (newKey.Type == null)
+                        {
+                            // Set the override key type to the default key type
+                            newKey.Type = k.Type;
+                        }
+
+                        // If the override key value is null
+                        if (newKey.Value == null)
+                        {
+                            // Set the override key value to the default key value
+                            newKey.Value = k.Value;
+                        }
+
+                        keyValue = newKey.ToDynamicString(profile.KeyDelimiter, mailItem.Body);
+                    }
+                    else
+                    {
+                        // Get the default key dynamic string
+                        keyValue = k.ToDynamicString(profile.KeyDelimiter, mailItem.Body);
+                    }
+
                     // Append the key value
-                    builder.Append(k.ToDynamicString(profile.KeyDelimiter, mailItem.Body));
+                    builder.Append(keyValue);
                 }
 
                 // Append the filename of the attachment
@@ -276,6 +324,22 @@ namespace MailAgent.Service
             }
 
             return builder.ToString();
+        }
+
+        private JSONKeys GetJSONKeys(string value)
+        {
+            JSONKeys keyOverrides = null;
+
+            try
+            {
+                keyOverrides = JsonConvert.DeserializeObject<JSONKeys>(value);
+            }
+            catch (Exception ex)
+            {
+                _logger.WriteError(ex);
+            }
+
+            return keyOverrides;
         }
 
         private void MoveItemToFolder(Item mailItem, string folderName, FolderId folderId = null)
