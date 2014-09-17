@@ -132,7 +132,7 @@ namespace MailAgent.Service
                 // skip the current email
                 if (!string.IsNullOrEmpty(profile.Alias))
                 {
-                    List<string> toAddress = GetToAddress(item);
+                    IEnumerable<string> toAddress = GetToAddress(item, profile.Alias);
 
                     if (toAddress != null && toAddress.Where(x => profile.Alias.Contains(x)).Count() == 0)
                     {
@@ -197,9 +197,9 @@ namespace MailAgent.Service
             return localExportText;
         }
 
-        private List<string> GetToAddress(Item mailItem)
+        private IEnumerable<string> GetToAddress(Item mailItem, string alias)
         {
-            List<string> returnResults = new List<string>();
+            IEnumerable<string> returnResults = null;
 
             ExtendedPropertyDefinition propertyDefinition = new ExtendedPropertyDefinition(0x007D, MapiPropertyType.String);
             PropertySet propertySet = new PropertySet(BasePropertySet.FirstClassProperties) { propertyDefinition, ItemSchema.MimeContent };
@@ -208,21 +208,10 @@ namespace MailAgent.Service
             Object headerValues;
             if (mailItem.TryGetProperty(propertyDefinition, out headerValues))
             {
-                Regex regex = new Regex("To:.*<(.*)>");
-                Regex regex2 = new Regex("CC:.*<(.*)>");
+                string headerString = headerValues.ToString();
 
-                Match match = regex.Match(headerValues.ToString());
-                Match match2 = regex2.Match(headerValues.ToString());
-
-                if (match.Groups.Count == 2)
-                {
-                    returnResults.Add(match.Groups[1].Value);
-                }
-
-                if (match2.Groups.Count == 2)
-                {
-                    returnResults.Add(match2.Groups[1].Value);
-                }
+                // Split the lines on newline char and find the line(s) that contain the alias
+                returnResults = headerString.Split('\n').Where(x => x.Contains(alias));
             }
 
             return returnResults;
