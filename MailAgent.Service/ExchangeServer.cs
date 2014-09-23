@@ -29,11 +29,22 @@ namespace MailAgent.Service
 
         private string _emailAddress;
 
-        public ExchangeServer(General settings, Logging _loggerger) : this(settings)
+        /// <summary>
+        /// Parameterized constructor for the class that allows for
+        /// the logging object to be passed in allowing for logging of information
+        /// </summary>
+        /// <param name="settings"></param>
+        /// <param name="_loggerger"></param>
+        public ExchangeServer(General settings, Logging logger) : this(settings)
         {
-            this._logger = _loggerger;
+            this._logger = logger;
         }
 
+        /// <summary>
+        /// Parameterized constructor for the class
+        /// Sets up the basic information required to 
+        /// </summary>
+        /// <param name="settings"></param>
         public ExchangeServer(General settings)
         {
             // Set the version of Exchange from settings file
@@ -75,6 +86,12 @@ namespace MailAgent.Service
             _globalSavePath = settings.DefaultSavePath;
         }
 
+        /// <summary>
+        /// The beginning of the entire program loop.
+        /// Gets all of the emails in the inbox and loops through
+        /// them checking of there is a profile that matches the email
+        /// </summary>
+        /// <param name="profiles"></param>
         public void SaveMail(Profile[] profiles)
         {
             // Get all of the mailbox items
@@ -89,7 +106,14 @@ namespace MailAgent.Service
             }
         }
 
-        private void SetSomeCrap(Item item, Profile[] profiles)
+        /// <summary>
+        /// Given the current email and profiles this should
+        /// loop through the array of profiles trying to find
+        /// the profile that matches the current email
+        /// </summary>
+        /// <param name="item"></param>
+        /// <param name="profiles"></param>
+        private void MatchItemToProfile(Item item, Profile[] profiles)
         {
             string localExportText = string.Empty;
 
@@ -117,7 +141,17 @@ namespace MailAgent.Service
             }
         }
 
-        private string ProfileCrap(Item item, Profile profile)
+        /// <summary>
+        /// Check to see if the item and the profile match,
+        /// if they do save the files and attachments
+        /// (if the profile wants them saved)
+        /// </summary>
+        /// <param name="item"></param>
+        /// <param name="profile"></param>
+        /// <returns>
+        /// The output string of index keys for the email
+        /// </returns>
+        private string ItemProfileCheck(Item item, Profile profile)
         {
             string localExportText = string.Empty;
 
@@ -198,7 +232,20 @@ namespace MailAgent.Service
             return localExportText;
         }
 
-        private IEnumerable<string> GetToAddress(Item mailItem, string alias)
+        /// <summary>
+        /// Try to find the given alias in the email headers
+        /// </summary>
+        /// <param name="mailItem">
+        /// The current Email Item
+        /// </param>
+        /// <param name="alias">
+        /// The email alias specified in the profile
+        /// </param>
+        /// <returns>
+        /// True if the alias was found in the headers
+        /// False if the alias was not found
+        /// </returns>
+        private bool CheckForAlias(Item mailItem, string alias)
         {
             IEnumerable<string> returnResults = null;
 
@@ -212,12 +259,30 @@ namespace MailAgent.Service
                 string headerString = headerValues.ToString();
 
                 // Split the lines on newline char and find the line(s) that contain the alias
-                returnResults = headerString.Split('\n').Where(x => x.Contains(alias));
+                if (headerString.ToLower().IndexOf(alias) != -1)
+                {
+                    return true;
+                }
             }
 
-            return returnResults;
+            return false;
         }
 
+        /// <summary>
+        /// Write the body of the email to the folder given in
+        /// the settings file for the current profile.
+        /// </summary>
+        /// <param name="mailItem">
+        /// The current email item
+        /// </param>
+        /// <param name="profile">
+        /// The profile that is being used to
+        /// write the email body to the output folder
+        /// </param>
+        /// <returns>
+        /// A delimited string of the index keys
+        /// and file location for the attachments
+        /// </returns>
         private string WriteEmailBodyForProfile(Item mailItem, Profile profile)
         {
             StringBuilder builder = new StringBuilder();
@@ -244,6 +309,21 @@ namespace MailAgent.Service
             return builder.ToString();
         }
 
+        /// <summary>
+        /// Writes the file attachments of the email to the folder
+        /// that is given in the settings file for the current profile.
+        /// </summary>
+        /// <param name="mailItem">
+        /// The current email item
+        /// </param>
+        /// <param name="profile">
+        /// The profile being used to write the
+        /// attachments to the folder
+        /// </param>
+        /// <returns>
+        /// A delimited string of the index keys
+        /// and file location for the attachments
+        /// </returns>
         private string WriteAttachmentsForProfile(Item mailItem, Profile profile)
         {
             StringBuilder builder = new StringBuilder();
@@ -326,7 +406,18 @@ namespace MailAgent.Service
             return builder.ToString();
         }
 
-        private JSONKeys GetJSONKeys(string value)
+        /// <summary>
+        /// Get the JSON Key override list from the email body.
+        /// The email body gets parsed for a script tag with type 'application/json'
+        /// to get the list of override keys in JSON format
+        /// </summary>
+        /// <param name="messageBody">
+        /// The string representation of the email body
+        /// </param>
+        /// <returns>
+        /// A list of keys to override or an empty list of keys
+        /// </returns>
+        private JSONKeys GetJsonKeyOverrideList(MessageBody messageBody)
         {
             JSONKeys keyOverrides = null;
 
@@ -342,6 +433,21 @@ namespace MailAgent.Service
             return keyOverrides;
         }
 
+        /// <summary>
+        /// Move the mail item to the folder, if the folder id is null
+        /// then it will get the folder id of the given folder name.
+        /// </summary>
+        /// <param name="mailItem">
+        /// The current email item
+        /// </param>
+        /// <param name="folderName">
+        /// The name of the folder that the email needs
+        /// to be moved into
+        /// </param>
+        /// <param name="folderId">
+        /// The Exchange Folder ID of the folder that the
+        /// email item needs to be moved into (can be null)
+        /// </param>
         private void MoveItemToFolder(Item mailItem, string folderName, FolderId folderId = null)
         {
             // If the folder id is null get the folder id by the folder name
@@ -354,6 +460,19 @@ namespace MailAgent.Service
             mailItem.Move(folderId);
         }
 
+        /// <summary>
+        /// Finds or creates the folder with the given name
+        /// </summary>
+        /// <param name="folderName">
+        /// The name of the folder
+        /// </param>
+        /// <param name="recurse">
+        /// Used to check if the call is a recursive call
+        /// </param>
+        /// <returns>
+        /// The ID of the folder that is currently
+        /// being referenced by name
+        /// </returns>
         private FolderId FindOrCreateFolderByName(string folderName, bool recurse = false)
         {
             // Get the top 100 folders for the email account
@@ -398,6 +517,16 @@ namespace MailAgent.Service
             return null;
         }
 
+        /// <summary>
+        /// Exchange version string match for the string name in the settings file
+        /// </summary>
+        /// <param name="checkVersion">
+        /// The string version to convert into the
+        /// ExchangeVersion enum
+        /// </param>
+        /// <returns>
+        /// The ExchangeVersion num (which API level to use)
+        /// </returns>
         private static ExchangeVersion GetVersionFromString(string checkVersion)
         {
             // Set exchange version (from settings)
