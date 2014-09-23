@@ -102,7 +102,7 @@ namespace MailAgent.Service
 
             foreach (Item item in inboxItems)
             {
-                SetSomeCrap(item, profiles);
+                MatchItemToProfile(item, profiles);
             }
         }
 
@@ -121,7 +121,7 @@ namespace MailAgent.Service
 
             foreach (Profile profile in profiles)
             {
-                localExportText = ProfileCrap(item, profile);
+                localExportText = ItemProfileCheck(item, profile);
 
                 if (!string.IsNullOrEmpty(localExportText))
                 {
@@ -167,11 +167,9 @@ namespace MailAgent.Service
                 // skip the current email
                 if (!string.IsNullOrEmpty(profile.Alias))
                 {
-                    IEnumerable<string> toAddress = GetToAddress(item, profile.Alias);
-
-                    if (toAddress != null && toAddress.Where(x => profile.Alias.Contains(x)).Count() == 0)
+                    if (!CheckForAlias(item, profile.Alias))
                     {
-                        _logger.WriteLine(Logging.Level.INFO, "Profile " + profile.Name + " does not have an alias for the email: " + item.Subject);
+                        _logger.WriteLine(Logging.Level.DEBUG, "Profile " + profile.Name + " does not have an alias for the email: " + item.Subject);
                         return string.Empty;
                     }
                 }
@@ -180,7 +178,7 @@ namespace MailAgent.Service
                 // and if the email subject does not contain the profile subject skip the current email
                 if (!string.IsNullOrEmpty(profile.EmailSubject) && !item.Subject.Contains(profile.EmailSubject))
                 {
-                    _logger.WriteLine(Logging.Level.INFO, "Profile " + profile.Name + " does not match the subject line for the email: " + item.Subject);
+                    _logger.WriteLine(Logging.Level.DEBUG, "Profile " + profile.Name + " does not match the subject line for the email: " + item.Subject);
                     return string.Empty;
                 }
 
@@ -188,9 +186,11 @@ namespace MailAgent.Service
                 // and if the email body does not contain the profile body skip the current email
                 if (profile.EmailBody.Length > 0 && !item.Body.Text.Contains(profile.EmailBody))
                 {
-                    _logger.WriteLine(Logging.Level.INFO, "Profile " + profile.Name + " does not match the body string for the email: " + item.Subject);
+                    _logger.WriteLine(Logging.Level.DEBUG, "Profile " + profile.Name + " does not match the body string for the email: " + item.Subject);
                     return string.Empty;
                 }
+
+                _logger.WriteLine(Logging.Level.INFO, "Email is using the profile " + profile.Name);
 
                 int totalItemsDropped = 0;
 
@@ -229,6 +229,8 @@ namespace MailAgent.Service
                 }
             }
 
+            _logger.WriteLine(Logging.Level.INFO, "Key File Data: \r\n" + localExportText);
+
             return localExportText;
         }
 
@@ -247,8 +249,6 @@ namespace MailAgent.Service
         /// </returns>
         private bool CheckForAlias(Item mailItem, string alias)
         {
-            IEnumerable<string> returnResults = null;
-
             ExtendedPropertyDefinition propertyDefinition = new ExtendedPropertyDefinition(0x007D, MapiPropertyType.String);
             PropertySet propertySet = new PropertySet(BasePropertySet.FirstClassProperties) { propertyDefinition, ItemSchema.MimeContent };
 
@@ -293,11 +293,15 @@ namespace MailAgent.Service
             // Save the file to the settings location with a filename of emailbody_{{timestamp}}.html
             string emailFilename = "emailbody_" + time + ".html";
 
+            // Write the email body to the profile's path
             File.WriteAllText(profile.SavePath + emailFilename, mailItem.Body);
-            
+
+            // Get the JSON Key Overrides from the email body
+            JSONKeys keyOverrideList = GetJsonKeyOverrideList(mailItem.Body);
+
             foreach (Key k in profile.Keys)
             {
-                builder.Append(k.ToDynamicString(profile.KeyDelimiter, mailItem.Body));
+                builder.Append(BuildIndexKeyString(k, profile.KeyDelimiter, mailItem.Body, keyOverrideList));
             }
 
             // Append the file name to exporting string
@@ -341,59 +345,15 @@ namespace MailAgent.Service
 
                 // Save the attachment to the location defined in the settings
                 File.WriteAllBytes(profile.SavePath + name, attachment.Content);
-                
-                // Get Body JSON Data
-                Match match = Regex.Match(mailItem.Body, "<script .*type=?(\"|')application/json?(\"|').*?>.*?({.*}).*?</script>", RegexOptions.Singleline);
 
-                // Log the results of the JSON Match
-                foreach (Group x in match.Groups)
-                {
-                    _logger.WriteLine(Logging.Level.DEBUG, "REGEX Matching Group: " + x.Value);
-                }
-
-                // Parse Body JSON Data
-                JSONKeys keyOverrideList = GetJSONKeys(match.Groups[match.Groups.Count].Value);
+                // Get the JSON Key Overrides from the email body
+                JSONKeys keyOverrideList = GetJsonKeyOverrideList(mailItem.Body);
 
                 // Foreach of the profile keys append the values to the export file
                 foreach (Key k in profile.Keys)
                 {
-                    string keyValue = string.Empty;
-                    Key newKey = null;
-
-                    // If the key override exists
-                    if (keyOverrideList != null)
-                    {
-                        // Get the override key that has the same name if it exists
-                        newKey = keyOverrideList.KeyOverrides.Where(x => x.Name == k.Name).SingleOrDefault();
-                    }
-
-                    // If there is an override key
-                    if (newKey != null)
-                    {
-                        // If the override key type is null
-                        if (newKey.Type == null)
-                        {
-                            // Set the override key type to the default key type
-                            newKey.Type = k.Type;
-                        }
-
-                        // If the override key value is null
-                        if (newKey.Value == null)
-                        {
-                            // Set the override key value to the default key value
-                            newKey.Value = k.Value;
-                        }
-
-                        keyValue = newKey.ToDynamicString(profile.KeyDelimiter, mailItem.Body);
-                    }
-                    else
-                    {
-                        // Get the default key dynamic string
-                        keyValue = k.ToDynamicString(profile.KeyDelimiter, mailItem.Body);
-                    }
-
                     // Append the key value
-                    builder.Append(keyValue);
+                    builder.Append(BuildIndexKeyString(k, profile.KeyDelimiter, mailItem.Body, keyOverrideList));
                 }
 
                 // Append the filename of the attachment
@@ -419,18 +379,92 @@ namespace MailAgent.Service
         /// </returns>
         private JSONKeys GetJsonKeyOverrideList(MessageBody messageBody)
         {
-            JSONKeys keyOverrides = null;
+            // Get Body JSON Data
+            Match match = Regex.Match(messageBody, "<script .*type=?(\"|')application/json?(\"|').*?>.*?(\\[.*\\]).*?</script>", RegexOptions.Singleline);
+
+            // Log the results of the JSON Match
+            foreach (Group x in match.Groups)
+            {
+                _logger.WriteLine(Logging.Level.DEBUG, "REGEX Matching Group: " + x.Value);
+            }
 
             try
             {
-                keyOverrides = JsonConvert.DeserializeObject<JSONKeys>(value);
+                string jsonString = match.Groups[match.Groups.Count - 1].Value;
+
+                jsonString = "{\"KeyOverrides\":" + jsonString + "}";
+
+                _logger.WriteLine(Logging.Level.DEBUG, "JSON String Matching: " + jsonString);
+
+                // Return the deserialize the keys
+                return JsonConvert.DeserializeObject<JSONKeys>(jsonString);
             }
             catch (Exception ex)
             {
+                // Write the exception to the log
                 _logger.WriteError(ex);
+
+                // Return null (couldn't convert)
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Builds the index key string based on the
+        /// key, delimiter and email body. Also allows
+        /// for the JSONKeys to override the current key value.
+        /// </summary>
+        /// <param name="key">
+        /// The key to build the index string of
+        /// </param>
+        /// <param name="delimiter">
+        /// The delimiter to seperate the key's value
+        /// from the next key
+        /// </param>
+        /// <param name="emailBody">
+        /// The string representation of the email body
+        /// </param>
+        /// <returns>
+        /// The string representation of the index key value
+        /// </returns>
+        private string BuildIndexKeyString(Key key, string delimiter, string emailBody, JSONKeys keyOverrideList = null)
+        {
+            string keyValue = string.Empty;
+            Key overrideKey = null;
+
+            // If the key override exists
+            if (keyOverrideList != null)
+            {
+                // Get the override key that has the same name if it exists
+                overrideKey = keyOverrideList.KeyOverrides.Where(x => x.Name == key.Name).SingleOrDefault();
             }
 
-            return keyOverrides;
+            // If there is an override key
+            if (overrideKey != null)
+            {
+                // If the override key type is null
+                if (overrideKey.Type == null)
+                {
+                    // Set the override key type to the default key type
+                    overrideKey.Type = key.Type;
+                }
+
+                // If the override key value is null
+                if (overrideKey.Value == null)
+                {
+                    // Set the override key value to the default key value
+                    overrideKey.Value = key.Value;
+                }
+
+                keyValue = overrideKey.ToDynamicString(delimiter, emailBody);
+            }
+            else
+            {
+                // Get the default key dynamic string
+                keyValue = key.ToDynamicString(delimiter, emailBody);
+            }
+
+            return keyValue;
         }
 
         /// <summary>
