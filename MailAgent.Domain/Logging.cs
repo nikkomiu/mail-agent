@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -84,6 +85,8 @@ namespace MailAgent.Domain
             this.WriteLine(Logging.Level.DEBUG, "Log Location:          " + generalSettings.Log.Location);
             this.WriteLine(Logging.Level.DEBUG, "Log Level:             " + generalSettings.Log.Level);
             this.WriteLine(Logging.Level.DEBUG, "Mail Polling Interval: " + generalSettings.Mail.Polling);
+            this.WriteLine(Logging.Level.INFO, "Email Address:         " + generalSettings.Mail.Email);
+            this.WriteLine(Logging.Level.INFO, "Version:                " + Assembly.GetEntryAssembly().GetName().Version);
 
             this.WriteLine(Level.INFO, "-----------------------------------------------------------");
         }
