@@ -379,17 +379,17 @@ namespace MailAgent.Service
         /// </returns>
         private JSONKeys GetJsonKeyOverrideList(MessageBody messageBody)
         {
-            // Get Body JSON Data
-            Match match = Regex.Match(messageBody, "<script .*type=?(\"|')application/json?(\"|').*?>.*?(\\[.*\\]).*?</script>", RegexOptions.Singleline);
-
-            // Log the results of the JSON Match
-            foreach (Group x in match.Groups)
-            {
-                _logger.WriteLine(Logging.Level.DEBUG, "REGEX Matching Group: " + x.Value);
-            }
-
             try
             {
+                // Get Body JSON Data
+                Match match = Regex.Match(messageBody, "<script .*type=?(\"|')application/json?(\"|').*?>.*?(\\[.*\\]).*?</script>", RegexOptions.Singleline);
+
+                // Log the results of the JSON Match
+                foreach (Group x in match.Groups)
+                {
+                    _logger.WriteLine(Logging.Level.DEBUG, "REGEX Matching Group: " + x.Value);
+                }
+
                 string jsonString = match.Groups[match.Groups.Count - 1].Value;
 
                 jsonString = "{\"KeyOverrides\":" + jsonString + "}";
@@ -433,7 +433,7 @@ namespace MailAgent.Service
             Key overrideKey = null;
 
             // If the key override exists
-            if (keyOverrideList != null)
+            if (keyOverrideList != null && keyOverrideList.KeyOverrides.Length > 0)
             {
                 // Get the override key that has the same name if it exists
                 overrideKey = keyOverrideList.KeyOverrides.Where(x => x.Name == key.Name).SingleOrDefault();
