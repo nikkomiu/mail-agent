@@ -45,6 +45,7 @@
     <Compile Include="Models\Export.cs" />
     <Compile Include="FileMan.cs" />
     <Compile Include="Models\General.cs" />
+    <Compile Include="Models\JSONKeys.cs" />
     <Compile Include="Models\Key.cs" />
     <Compile Include="Models\Log.cs" />
     <Compile Include="Logging.cs" />
