@@ -301,7 +301,7 @@ namespace MailAgent.Service
 
             foreach (Key k in profile.Keys)
             {
-                builder.Append(BuildIndexKeyString(k, profile.KeyDelimiter, mailItem.Body, keyOverrideList));
+                builder.Append(BuildIndexKeyString(OverrideKey(k, keyOverrideList), profile.KeyDelimiter, mailItem.Body, keyOverrideList));
             }
 
             // Append the file name to exporting string
@@ -353,7 +353,7 @@ namespace MailAgent.Service
                 foreach (Key k in profile.Keys)
                 {
                     // Append the key value
-                    builder.Append(BuildIndexKeyString(k, profile.KeyDelimiter, mailItem.Body, keyOverrideList));
+                    builder.Append(BuildIndexKeyString(OverrideKey(k, keyOverrideList), profile.KeyDelimiter, mailItem.Body, keyOverrideList));
                 }
 
                 // Append the filename of the attachment
@@ -364,6 +364,26 @@ namespace MailAgent.Service
             }
 
             return builder.ToString();
+        }
+
+        private Key OverrideKey(Key currentKey, JSONKeys keyOverrides)
+        {
+            if (keyOverrides.KeyOverrides.Any(x => x.Name == currentKey.Name))
+            {
+                Key tempKey = keyOverrides.KeyOverrides.Where(x => x.Name == currentKey.Name).SingleOrDefault();
+
+                if (tempKey.Type != null)
+                {
+                    currentKey.Type = tempKey.Type;
+                }
+
+                if (tempKey.Value != null)
+                {
+                    currentKey.Value = tempKey.Value;
+                }
+            }
+
+            return currentKey;
         }
 
         /// <summary>
@@ -382,7 +402,7 @@ namespace MailAgent.Service
             try
             {
                 // Get Body JSON Data
-                Match match = Regex.Match(messageBody, "<script .*type=?(\"|')application/json?(\"|').*?>.*?(\\[.*\\]).*?</script>", RegexOptions.Singleline);
+                Match match = Regex.Match(messageBody, "<script .*type=?(\\\"|')application/json?(\\\"|').*?>.*?(\\[.*\\]).*?</script>", RegexOptions.Singleline);
 
                 // Log the results of the JSON Match
                 foreach (Group x in match.Groups)
@@ -396,8 +416,15 @@ namespace MailAgent.Service
 
                 _logger.WriteLine(Logging.Level.DEBUG, "JSON String Matching: " + jsonString);
 
+                JSONKeys newKeys = JsonConvert.DeserializeObject<JSONKeys>(jsonString);
+
+                foreach (Key k in newKeys.KeyOverrides)
+                {
+                    _logger.WriteLine(Logging.Level.DEBUG, "Key: " + k.Name + ", Value: " + k.Value);
+                }
+
                 // Return the deserialize the keys
-                return JsonConvert.DeserializeObject<JSONKeys>(jsonString);
+                return newKeys;
             }
             catch (Exception ex)
             {
