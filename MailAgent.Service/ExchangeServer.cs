@@ -1,4 +1,4 @@
-﻿using MailAgent.Domain;
+using MailAgent.Domain;
 using MailAgent.Domain.Models;
 using Microsoft.Exchange.WebServices.Data;
 using Newtonsoft.Json;
@@ -368,7 +368,7 @@ namespace MailAgent.Service
 
         private Key OverrideKey(Key currentKey, JSONKeys keyOverrides)
         {
-            if (keyOverrides.KeyOverrides.Any(x => x.Name == currentKey.Name))
+            if (keyOverrides != null && keyOverrides.KeyOverrides.Any(x => x.Name == currentKey.Name))
             {
                 Key tempKey = keyOverrides.KeyOverrides.Where(x => x.Name == currentKey.Name).SingleOrDefault();
 
@@ -411,6 +411,11 @@ namespace MailAgent.Service
                 }
 
                 string jsonString = match.Groups[match.Groups.Count - 1].Value;
+
+                if (jsonString.Length == 0)
+                {
+                    return null;
+                }
 
                 jsonString = "{\"KeyOverrides\":" + jsonString + "}";
 
