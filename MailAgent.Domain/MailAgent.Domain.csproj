@@ -55,7 +55,7 @@
     <Compile Include="Models\Settings.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Settings.xml">
+    <Content Include="Settings.xml.sample">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

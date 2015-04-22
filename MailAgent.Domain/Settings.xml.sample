@@ -1,0 +1,178 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Settings>
+  <General>
+    <Log>
+      <LocalLocation>True</LocalLocation>
+      <Location>mail_agent.log</Location>
+      <Level>CRITICAL</Level>
+    </Log>
+    <Mail>
+      <Polling>300</Polling>
+      <ExchangeVersion>2010 SP2</ExchangeVersion>
+      <UseWindowsCredentials>False</UseWindowsCredentials>
+      <Email>address@example.com</Email>
+      
+      <Password>somepasswordforemail</Password>
+      <ErrorFolder>Errors</ErrorFolder>
+      <SuccessFolder>Success</SuccessFolder>
+      <Url>Auto</Url>
+    </Mail>
+    <DefaultSavePath>\\server\share</DefaultSavePath>
+    <Export>
+      <Filename>import.csv</Filename>
+      <KeyDelimiter>,</KeyDelimiter>
+    </Export>
+  </General>
+  <Profiles>
+    <Profile>
+      <Name>Profile 1</Name>
+      <Active>False</Active>
+      <EmailSubject></EmailSubject>
+      <EmailBody Save="True">Document</EmailBody>
+      <SaveAttachments>False</SaveAttachments>
+      <!-- <SavePath></SavePath> -->
+      <!-- <KeyDelimiter></KeyDelimiter> -->
+
+      <!--
+        Keys (from top to bottom in order) to use in the index file.
+          Set Type to Manual for static text that goes in the key.
+          Set Type to Search to search for text in the email body
+          Set Type to Dynamic to set one of the 'dynamic' fields:
+            - DATETIME
+            - DATE
+            - TIME
+            - NULL
+        -->
+      <Keys>
+        <Key>
+          <Name>Drawer</Name>
+          <Type>Static</Type>
+          <Value>Some Value</Value>
+        </Key>
+        <Key>
+          <Name>Field1</Name>
+          <Type>Static</Type>
+          <Value>Abc</Value>
+        </Key>
+        <Key>
+          <Name>Field2</Name>
+          <Type>Static</Type>
+          <Value>Def</Value>
+        </Key>
+        <Key>
+          <Name>Field3</Name>
+          <Type>Static</Type>
+          <Value>Ghi</Value>
+        </Key>
+        <Key>
+          <Name>Field4</Name>
+          <Type>Dynamic</Type>
+          <Value>NULL</Value>
+        </Key>
+        <Key>
+          <Name>Field5</Name>
+          <Type>Dynamic</Type>
+          <Value>DATETIME</Value>
+        </Key>
+        <Key>
+          <Name>DocType</Name>
+          <Type>Static</Type>
+          <Value>Document Type</Value>
+        </Key>
+      </Keys>
+    </Profile>
+    <Profile>
+      <Name>Profile 2</Name>
+      <Active>True</Active>
+
+      <!-- The API Key provided to the department -->
+      <EmailSubject>bb432hj432jkh43jkh43jk24h3k2j</EmailSubject>
+      <EmailBody Save="True"></EmailBody>
+      <SaveAttachments>True</SaveAttachments>
+      <Keys>
+        <Key>
+          <Name>Drawer</Name>
+          <Type>Static</Type>
+          <Value>INMA</Value>
+        </Key>
+        <Key>
+          <Name>Field1</Name>
+          <Type>Static</Type>
+          <Value>Some Value</Value>
+        </Key>
+        <Key>
+          <Name>Field2</Name>
+          <Type>Static</Type>
+          <Value>Some other value</Value>
+        </Key>
+        <Key>
+          <Name>Field3</Name>
+          <Type>Dynamic</Type>
+          <Value>INCREMENT</Value>
+        </Key>
+        <Key>
+          <Name>Field4</Name>
+          <Type>Dynamic</Type>
+          <Value>NULL</Value>
+        </Key>
+        <Key>
+          <Name>Field5</Name>
+          <Type>Dynamic</Type>
+          <Value>DATETIME</Value>
+        </Key>
+        <Key>
+          <Name>DocType</Name>
+          <Type>Static</Type>
+          <Value>INMA-Temp</Value>
+        </Key>
+      </Keys>
+    </Profile>
+    <Profile>
+      <Name>Profile 3</Name>
+      <Active>True</Active>
+      <Alias>somealias@example.com</Alias>
+
+      <!-- The API Key provided to the department -->
+      <EmailSubject></EmailSubject>
+      <EmailBody Save="False"></EmailBody>
+      <SaveAttachments>True</SaveAttachments>
+      <Keys>
+        <Key>
+          <Name>Drawer</Name>
+          <Type>Static</Type>
+          <Value>INMA</Value>
+        </Key>
+        <Key>
+          <Name>Field1</Name>
+          <Type>Static</Type>
+          <Value>Some Field Value</Value>
+        </Key>
+        <Key>
+          <Name>Field2</Name>
+          <Type>Static</Type>
+          <Value>Some Field Value 2</Value>
+        </Key>
+        <Key>
+          <Name>Field3</Name>
+          <Type>Dynamic</Type>
+          <Value>INCREMENT</Value>
+        </Key>
+        <Key>
+          <Name>Field4</Name>
+          <Type>Dynamic</Type>
+          <Value>NULL</Value>
+        </Key>
+        <Key>
+          <Name>Field5</Name>
+          <Type>Dynamic</Type>
+          <Value>DATETIME</Value>
+        </Key>
+        <Key>
+          <Name>DocType</Name>
+          <Type>Static</Type>
+          <Value>INMA-Temp</Value>
+        </Key>
+      </Keys>
+    </Profile>
+  </Profiles>
+</Settings>
