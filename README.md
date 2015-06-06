@@ -1,19 +1,4 @@
-## Table of Contents
-
-- [Install](#installation)
-- [Change Service User](#change-user-running-service)
-- [Uninstall](#uninstallation)
-- [Settings](#settings)
-  - [General](#general)
-  - [Log](#log)
-  - [Mail](#mail)
-  - [DefaultSavePath](#defaultsavepath)
-  - [Export](#export)
-  - [Profiles](#profiles)
-    - [Profile Settings (Overview)](#profile-settings)
-    - [Profile Keys](#profile-keys-overview)
-      - [Description](#profile-key-description)
-      - [Example](#example-keys)
+# Mail Agent
 
 ## Compile
 
