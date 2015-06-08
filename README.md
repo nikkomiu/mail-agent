@@ -178,11 +178,26 @@ Settings:
 <EmailBody Save="True"></EmailBody>
 <KeyDelimiter>,</KeyDelimiter>
 <Keys>
-  <Attr1 Type="Static">Static Text</Attr1>
-  <Attr2 Type="Dynamic">NULL</Attr2>
-  <Attr3 Type="Search">Name:</Attr3>
-  <Attr4 Type="Search">Phone:</Attr4>
-  <Attr5 Type="Dynamic">DATE</Attr5>
+  <Key>
+    <Name>Attr1</Name>
+    <Type>Static</Type>
+    <Value>Something</Value>
+  </Key>
+  <Key>
+    <Name>Attr2</Name>
+    <Type>Dynamic</Type>
+    <Value>NULL</Value>
+  </Key>
+  <Key>
+    <Name>Attr3</Name>
+    <Type>Search</Type>
+    <Value>Name</Value>
+  </Key>
+  <Key>
+    <Name>Attr4</Name>
+    <Type>Dynamic</Type>
+    <Value>DATE</Value>
+  </Key>
 </Keys>
 ...
 ```
